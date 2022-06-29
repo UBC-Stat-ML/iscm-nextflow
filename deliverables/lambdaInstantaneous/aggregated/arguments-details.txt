@@ -1,4 +1,4 @@
-  --dataPathInEachExecFolder actualTemperedRestarts.csv swapSummaries.csv    # <List>
+  --dataPathInEachExecFolder lambdaInstantaneous.csv.gz logNormalizationConstantProgress.csv.gz annealingParameters.csv.gz roundTimings.csv.gz    # <List>
 #   description: Comma separated value (cvs or csv.gz) file(s) in each exec containing the data to be aggregated.
 
 # --execFoldersPrefix <String> (default value: exec_)
@@ -30,5 +30,5 @@
 
   --experimentConfigs.tabularWriter.compressed true    # <boolean> (default value: false)
 
-  --keys engine.nChains as nChains engine.reversible as reversible engine.random as random from arguments.tsv    # <String>
+  --keys engine as method model from arguments.tsv    # <String>
 #   description: Command line arguments stored in tab separated values for each exec. Syntax: comma separated list of (<key> [as <transformed-key>] )* from [optional] <tsv-file-in-each-exec>

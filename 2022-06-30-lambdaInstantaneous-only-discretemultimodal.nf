@@ -28,15 +28,10 @@ process runBlang {
   errorStrategy 'ignore'  
 
   input:
-    each method from '--engine iscm.ISCM --engine.nThreads Single --engine.scm.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.scm.nParticles 20',
-                     '--engine PT --engine.nThreads Single --engine.nScans 10000 --engine.nChains 20'
+    each method from '--engine iscm.ISCM --engine.scm.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 10 --engine.nRounds 15 --engine.scm.nParticles 50',
+                     '--engine PT  --engine.nScans 20000 --engine.nChains 40'
                      
-    each model from  '--model blang.validation.internals.fixtures.Ising --model.beta 1',
-                     '--model demos.DiscreteMultimodal',
-                     '--model demos.AnnealedMVN',
-                     '--model demos.UnidentifiableProduct',
-                     '--model demos.XY',
-                     '--model demos.ToyMix'
+    each model from  '--model demos.DiscreteMultimodal'
 
     file code
     file data
@@ -113,7 +108,7 @@ process plot {
       scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("lambdaInstantaneous.pdf", width = 10, height = 5)
+  ggsave("lambdaInstantaneous.pdf", width = 4, height = 4)
   
   read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
@@ -124,21 +119,7 @@ process plot {
       scale_x_log10() +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 5)
-  
-  read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
-    inner_join(timings, by = c("model", "method", "round")) %>% 
-    rename(time = value.y) %>%
-    rename(value = value.x) %>%
-    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
-    mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
-    ggplot(aes(x = time, y = value, colour = method)) +
-      geom_line()  + 
-      scale_x_log10() +
-      facet_wrap(~model, scales = "free_y") +
-      theme_minimal()
-  ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 5)
+  ggsave("logNormalizationConstantProgress-by-round.pdf", width = 4, height = 4)
   
   read.csv("${aggregated}/annealingParameters.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
@@ -149,7 +130,7 @@ process plot {
       facet_grid(model~method, scales = "free_y") +
       scale_y_log10() +
       theme_minimal()
-  ggsave("annealingParameters.pdf", width = 10, height = 15)
+  ggsave("annealingParameters.pdf", width = 4, height = 4)
   """
   
 }

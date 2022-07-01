@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from 'faddb83ddd1f461212aa77eb27fc002f27b51da2'
+    val codeRevision from 'eaebb3473786e6df39a3fe63ffaf064eba0998ca'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -41,8 +41,8 @@ process runBlang {
                      '--model demos.PhylogeneticTree --model.observations.file data/primates.fasta --model.observations.encoding DNA',
                      '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
                      '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
-                     '--model hier.HierarchicalRockets --model.data data/failure_counts.csv --model.rocketTypes.name LV.Type', 
-                     '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
+                     '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
+                     '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
                      
     file code
     file data

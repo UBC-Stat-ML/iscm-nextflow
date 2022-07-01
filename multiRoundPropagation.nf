@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from 'a5db020faecd05e7ef1abee7d78acda8d9d7f430'
+    val codeRevision from 'faddb83ddd1f461212aa77eb27fc002f27b51da2'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -23,7 +23,7 @@ process buildCode {
 params.nRounds = 10
 
 process runBlang {
-  time '5h'  
+  time '10h'  
   cpus 1
   memory '10 GB'
   errorStrategy 'ignore'  
@@ -36,7 +36,6 @@ process runBlang {
                      '--model demos.UnidentifiableProduct',
                      '--model demos.XY',
                      '--model demos.ToyMix',
-                     '--model chromobreak.SingleCell --model.data.source data/chromo/gc.csv --model.data.gcContents.name value --model.data.readCounts.name value --model.data.readCounts.dataSource data/chromo/7.csv --postProcessor chromobreak.ChromoPostProcessor --model.configs.annealingStrategy Exponentiation --model.configs.annealingStrategy.thinning 1',
                      '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
                      '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
                      '--model demos.PhylogeneticTree --model.observations.file data/primates.fasta --model.observations.encoding DNA',

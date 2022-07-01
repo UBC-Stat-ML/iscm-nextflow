@@ -12,4 +12,4 @@ read.csv("aggregated/multiRoundPropagation.csv.gz") %>%
     facet_grid(model~round, scales = "free_y") +
     scale_y_log10() +
     theme_bw()
-ggsave("multiRoundPropagation-by-iteration.pdf", width = 10, height = 15)
+ggsave("multiRoundPropagation-by-iteration.pdf", width = 20, height = 30, limitsize = FALSE)

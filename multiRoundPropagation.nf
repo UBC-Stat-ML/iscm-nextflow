@@ -118,7 +118,7 @@ process plot {
       facet_grid(model~round, scales = "free_y") +
       scale_y_log10() +
       theme_bw()
-  ggsave("multiRoundPropagation-by-iteration.pdf", width = 20, height = 30, limitsize = FALSE)
+  ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
   """
   
 }

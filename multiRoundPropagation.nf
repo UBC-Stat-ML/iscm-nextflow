@@ -23,9 +23,10 @@ process buildCode {
 params.nRounds = 10
 
 process runBlang {
-  time '1h'  
+  time '5h'  
   cpus 1
-  //errorStrategy 'ignore'  
+  memory '10 GB'
+  errorStrategy 'ignore'  
 
   input:
                      
@@ -34,8 +35,16 @@ process runBlang {
                      '--model demos.AnnealedMVN',
                      '--model demos.UnidentifiableProduct',
                      '--model demos.XY',
-                     '--model demos.ToyMix'
-
+                     '--model demos.ToyMix',
+                     '--model chromobreak.SingleCell --model.data.source data/chromo/gc.csv --model.data.gcContents.name value --model.data.readCounts.name value --model.data.readCounts.dataSource data/chromo/7.csv --postProcessor chromobreak.ChromoPostProcessor --model.configs.annealingStrategy Exponentiation --model.configs.annealingStrategy.thinning 1',
+                     '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
+                     '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
+                     '--model demos.PhylogeneticTree --model.observations.file data/primates.fasta --model.observations.encoding DNA',
+                     '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
+                     '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
+                     '--model hier.HierarchicalRockets --model.data data/failure_counts.csv --model.rocketTypes.name LV.Type', 
+                     '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
+                     
     file code
     file data
     
@@ -43,7 +52,7 @@ process runBlang {
     file 'output' into results
     
   """
-  java -Xmx5g -cp ${code}/lib/\\* blang.runtime.Runner \
+  java -Xmx5g -cp ${code}/lib/\\* -Xmx10g blang.runtime.Runner \
     --experimentConfigs.resultsHTMLPage false \
     --experimentConfigs.tabularWriter.compressed true \
     --engine iscm.ISCM \
@@ -110,7 +119,7 @@ process plot {
       facet_grid(model~round, scales = "free_y") +
       scale_y_log10() +
       theme_bw()
-  ggsave("multiRoundPropagation-by-iteration.pdf", width = 10, height = 15)
+  ggsave("multiRoundPropagation-by-iteration.pdf", width = 20, height = 30, limitsize = FALSE)
   """
   
 }

@@ -1,0 +1,1 @@
+--experimentConfigs.resultsHTMLPage false --experimentConfigs.tabularWriter.compressed true --dataPathInEachExecFolder propagation.csv.gz multiRoundPropagation.csv.gz --keys engine as method model from arguments.tsv

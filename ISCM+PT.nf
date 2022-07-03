@@ -45,7 +45,7 @@ process runBlang {
                      '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 
                      
-    each method from '--engine iscm.ISCM --engine.nThreads Single --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.scm.nParticles 20',
+    each method from '--engine iscm.ISCM --engine.nThreads Single --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.nParticles 20',
                      '--engine PT --engine.nThreads Single --engine.nScans 10000 --engine.nChains 20'    
 
     file code
@@ -144,7 +144,7 @@ process plot {
       scale_x_log10() +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 5)
+  ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 10)
   
   read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
     inner_join(timings, by = c("model", "method", "round")) %>% 
@@ -158,7 +158,7 @@ process plot {
       scale_x_log10() +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 5)
+  ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 10)
   
   read.csv("${aggregated}/annealingParameters.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
@@ -169,7 +169,7 @@ process plot {
       facet_grid(model~method, scales = "free_y") +
       scale_y_log10() +
       theme_minimal()
-  ggsave("annealingParameters.pdf", width = 10, height = 15)
+  ggsave("annealingParameters.pdf", width = 10, height = 30)
   """
   
 }

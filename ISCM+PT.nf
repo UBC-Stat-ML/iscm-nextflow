@@ -133,7 +133,7 @@ process plot {
       scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("lambdaInstantaneous.pdf", width = 10, height = 5)
+  ggsave("lambdaInstantaneous.pdf", width = 10, height = 5, limitsize = FALSE)
   
   read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
@@ -144,7 +144,7 @@ process plot {
       scale_x_log10() +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 10)
+  ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 10, limitsize = FALSE)
   
   read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
     inner_join(timings, by = c("model", "method", "round")) %>% 
@@ -158,7 +158,7 @@ process plot {
       scale_x_log10() +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 10)
+  ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 10, limitsize = FALSE)
   
   read.csv("${aggregated}/annealingParameters.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
@@ -169,7 +169,7 @@ process plot {
       facet_grid(model~method, scales = "free_y") +
       scale_y_log10() +
       theme_minimal()
-  ggsave("annealingParameters.pdf", width = 10, height = 30)
+  ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
   """
   
 }

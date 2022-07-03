@@ -8,8 +8,8 @@ read.csv("aggregated/multiRoundPropagation.csv.gz") %>%
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   ggplot(aes(x = iteration, y = ess)) +
     geom_line()  + 
-    facet_grid(model~round, scales = "free_y") +
-    theme_bw()
+    facet_grid(model~round, scales = "free") +
+    theme_minimal()
 ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
 
 timings <- read.csv("aggregated/roundTimings.csv.gz")

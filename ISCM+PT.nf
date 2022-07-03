@@ -25,7 +25,7 @@ nCPUs = 5
 process runBlang {
   time '10h'  
   cpus nCPUs
-  memory '20 GB'
+  memory '10 GB'
   errorStrategy 'ignore'  
 
   input:

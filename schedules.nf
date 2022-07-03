@@ -25,7 +25,7 @@ nCPUs = 5
 process runBlang {
   time '10h'  
   cpus nCPUs
-  memory '60 GB'
+  memory '50 GB'
   errorStrategy 'ignore'  
 
   input:
@@ -52,7 +52,7 @@ process runBlang {
     file 'output' into results
     
   """
-  java -Xmx10g -cp ${code}/lib/\\* blang.runtime.Runner \
+  java -Xmx50g -cp ${code}/lib/\\* blang.runtime.Runner \
     --experimentConfigs.resultsHTMLPage false \
     --experimentConfigs.tabularWriter.compressed true \
     $model \

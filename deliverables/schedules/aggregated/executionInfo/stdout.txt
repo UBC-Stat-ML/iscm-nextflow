@@ -6,6 +6,7 @@ Processing propagation.csv.gz from exec_5
 Processing propagation.csv.gz from exec_9
 Processing propagation.csv.gz from exec_4
 Processing propagation.csv.gz from exec_10
+Processing propagation.csv.gz from exec_24
 Processing propagation.csv.gz from exec_8
 Processing propagation.csv.gz from exec_20
 Processing propagation.csv.gz from exec_6
@@ -29,6 +30,7 @@ Processing multiRoundPropagation.csv.gz from exec_5
 Processing multiRoundPropagation.csv.gz from exec_9
 Processing multiRoundPropagation.csv.gz from exec_4
 Processing multiRoundPropagation.csv.gz from exec_10
+Processing multiRoundPropagation.csv.gz from exec_24
 Processing multiRoundPropagation.csv.gz from exec_8
 Processing multiRoundPropagation.csv.gz from exec_20
 Processing multiRoundPropagation.csv.gz from exec_6

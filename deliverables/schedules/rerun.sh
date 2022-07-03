@@ -23,8 +23,8 @@ df %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   mutate(method = str_replace(method, ".*[.]", "")) %>% 
-  ggplot(aes(x = relative_iter, y = annealingParameter, colour = method)) +
-    geom_line() + 
+  ggplot(aes(x = relative_iter, y = annealingParameter, linetype = method, color = method)) +
+    geom_line(alpha = 0.8) + 
     facet_wrap(~model) +
     theme_minimal()
 ggsave("annealingSchedules.pdf", width = 10, height = 10, limitsize = FALSE)

@@ -25,7 +25,7 @@ nCPUs = 5
 process runBlang {
   time '10h'  
   cpus nCPUs
-  memory '10 GB'
+  memory '20 GB'
   errorStrategy 'ignore'  
 
   input:
@@ -40,7 +40,6 @@ process runBlang {
                      '--model demos.ToyMix',
                      '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
                      '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
-                     '--model demos.PhylogeneticTree --model.observations.file data/primates.fasta --model.observations.encoding DNA',
                      '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
                      '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
                      '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
@@ -129,8 +128,8 @@ process plot {
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>% 
-    ggplot(aes(x = relative_iter, y = annealingParameter, colour = method)) +
-      geom_line() + 
+    ggplot(aes(x = relative_iter, y = annealingParameter, linetype = method, color = method)) +
+      geom_line(alpha = 0.8) + 
       facet_wrap(~model) +
       theme_minimal()
   ggsave("annealingSchedules.pdf", width = 10, height = 10, limitsize = FALSE)

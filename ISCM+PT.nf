@@ -25,7 +25,7 @@ nCPUs = 5
 process runBlang {
   time '10h'  
   cpus nCPUs
-  memory '10 GB'
+  memory '20 GB'
   errorStrategy 'ignore'  
 
   input:
@@ -38,7 +38,6 @@ process runBlang {
                      '--model demos.ToyMix',
                      '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
                      '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
-                     '--model demos.PhylogeneticTree --model.observations.file data/primates.fasta --model.observations.encoding DNA',
                      '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
                      '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
                      '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
@@ -130,7 +129,7 @@ process plot {
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>% 
-    ggplot(aes(x = beta, y = value, colour = method)) +
+    ggplot(aes(x = beta, y = value, colour = method, linetype = method)) +
       geom_line()  + 
       scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
       facet_wrap(~model, scales = "free_y") +
@@ -155,7 +154,7 @@ process plot {
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>% 
-    ggplot(aes(x = time, y = value, colour = method)) +
+    ggplot(aes(x = time, y = value, colour = method, linetype = method)) +
       geom_line()  + 
       scale_x_log10() +
       facet_wrap(~model, scales = "free_y") +

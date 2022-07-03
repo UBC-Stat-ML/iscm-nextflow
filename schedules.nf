@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from 'eaebb3473786e6df39a3fe63ffaf064eba0998ca'
+    val codeRevision from '1f1d46ce2a3de940f5b6261734ed3c35b34f35db'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -20,16 +20,16 @@ process buildCode {
     template 'buildRepo.sh' // for quick prototyping, switch to 'buildSnapshot', and set cache to false above
 }
 
-
+nCPUs = 5
 
 process runBlang {
-  time '1h'  
-  cpus 1
+  time '10h'  
+  cpus nCPUs
+  memory '10 GB'
   errorStrategy 'ignore'  
 
   input:
     each method from '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.nParticles 20',
-                     '--engine PT --engine.nScans 10000 --engine.nChains 20',
                      '--engine SCM --engine.nParticles 10000'
                      
     each model from  '--model blang.validation.internals.fixtures.Ising --model.beta 1',
@@ -37,7 +37,14 @@ process runBlang {
                      '--model demos.AnnealedMVN',
                      '--model demos.UnidentifiableProduct',
                      '--model demos.XY',
-                     '--model demos.ToyMix'
+                     '--model demos.ToyMix',
+                     '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
+                     '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
+                     '--model demos.PhylogeneticTree --model.observations.file data/primates.fasta --model.observations.encoding DNA',
+                     '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
+                     '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
+                     '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
+                     '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 
     file code
     file data
@@ -46,11 +53,13 @@ process runBlang {
     file 'output' into results
     
   """
-  java -Xmx5g -cp ${code}/lib/\\* blang.runtime.Runner \
+  java -Xmx10g -cp ${code}/lib/\\* blang.runtime.Runner \
     --experimentConfigs.resultsHTMLPage false \
     --experimentConfigs.tabularWriter.compressed true \
     $model \
-    $method  
+    $method  \
+    --engine.nThreads Fixed \
+    --engine.nThreads.number $nCPUs
      
   # consolidate all csv files in one place
   mkdir output
@@ -124,7 +133,7 @@ process plot {
       geom_line() + 
       facet_wrap(~model) +
       theme_minimal()
-  ggsave("annealingSchedules.pdf", width = 10, height = 5)
+  ggsave("annealingSchedules.pdf", width = 10, height = 10, limitsize = FALSE)
 
   """
   

@@ -20,11 +20,11 @@ process buildCode {
     template 'buildRepo.sh' // for quick prototyping, switch to 'buildSnapshot', and set cache to false above
 }
 
-
+nCPUs = 5
 
 process runBlang {
   time '10h'  
-  cpus 1
+  cpus nCPUs
   memory '10 GB'
   errorStrategy 'ignore'  
 
@@ -45,8 +45,8 @@ process runBlang {
                      '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 
                      
-    each method from '--engine iscm.ISCM --engine.nThreads Single --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.nParticles 20',
-                     '--engine PT --engine.nThreads Single --engine.nScans 10000 --engine.nChains 20'    
+    each method from '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.nParticles 20',
+                     '--engine PT --engine.nScans 10000 --engine.nChains 20'    
 
     file code
     file data
@@ -55,11 +55,13 @@ process runBlang {
     file 'output' into results
     
   """
-  java -Xmx5g -cp ${code}/lib/\\* blang.runtime.Runner \
+  java -Xmx10g -cp ${code}/lib/\\* blang.runtime.Runner \
     --experimentConfigs.resultsHTMLPage false \
     --experimentConfigs.tabularWriter.compressed true \
     $model \
-    $method  
+    $method  \
+    --engine.nThreads Fixed \
+    --engine.nThreads.number $nCPUs
      
   # consolidate all csv files in one place
   mkdir output

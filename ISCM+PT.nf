@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from 'eaebb3473786e6df39a3fe63ffaf064eba0998ca'
+    val codeRevision from '1f1d46ce2a3de940f5b6261734ed3c35b34f35db'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -20,7 +20,7 @@ process buildCode {
     template 'buildRepo.sh' // for quick prototyping, switch to 'buildSnapshot', and set cache to false above
 }
 
-params.nRounds = 10
+
 
 process runBlang {
   time '10h'  
@@ -43,7 +43,11 @@ process runBlang {
                      '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
                      '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
                      '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
+
                      
+    each method from '--engine iscm.ISCM --engine.nThreads Single --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.scm.nParticles 20',
+                     '--engine PT --engine.nThreads Single --engine.nScans 10000 --engine.nChains 20'    
+
     file code
     file data
     
@@ -51,16 +55,11 @@ process runBlang {
     file 'output' into results
     
   """
-  java -Xmx5g -cp ${code}/lib/\\* -Xmx10g blang.runtime.Runner \
+  java -Xmx5g -cp ${code}/lib/\\* blang.runtime.Runner \
     --experimentConfigs.resultsHTMLPage false \
     --experimentConfigs.tabularWriter.compressed true \
-    --engine iscm.ISCM \
-    --engine.nThreads Single \
-    --engine.usePosteriorSamplingScan true \
-    --engine.initialNumberOfSMCIterations 2 \
-    --engine.nRounds $params.nRounds \
-    --engine.nParticles 20 \
-    $model  
+    $model \
+    $method  
      
   # consolidate all csv files in one place
   mkdir output
@@ -83,6 +82,10 @@ process aggregate {
     --experimentConfigs.resultsHTMLPage false \
     --experimentConfigs.tabularWriter.compressed true \
     --dataPathInEachExecFolder \
+        lambdaInstantaneous.csv.gz \
+        logNormalizationConstantProgress.csv.gz \
+        annealingParameters.csv.gz \
+        roundTimings.csv.gz \
         multiRoundPropagation.csv.gz \
     --keys \
       engine as method \
@@ -112,13 +115,61 @@ process plot {
   read.csv("${aggregated}/multiRoundPropagation.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     ggplot(aes(x = iteration, y = ess)) +
       geom_line()  + 
       facet_grid(model~round, scales = "free_y") +
-      scale_y_log10() +
       theme_bw()
   ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
+  
+  timings <- read.csv("${aggregated}/roundTimings.csv.gz")
+  
+  read.csv("${aggregated}/lambdaInstantaneous.csv.gz") %>%
+    filter(isAdapt == "false") %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    ggplot(aes(x = beta, y = value, colour = method)) +
+      geom_line()  + 
+      scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
+      facet_wrap(~model, scales = "free_y") +
+      theme_minimal()
+  ggsave("lambdaInstantaneous.pdf", width = 10, height = 5)
+  
+  read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    ggplot(aes(x = round, y = value, colour = method)) +
+      geom_line()  + 
+      scale_x_log10() +
+      facet_wrap(~model, scales = "free_y") +
+      theme_minimal()
+  ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 5)
+  
+  read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
+    inner_join(timings, by = c("model", "method", "round")) %>% 
+    rename(time = value.y) %>%
+    rename(value = value.x) %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    ggplot(aes(x = time, y = value, colour = method)) +
+      geom_line()  + 
+      scale_x_log10() +
+      facet_wrap(~model, scales = "free_y") +
+      theme_minimal()
+  ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 5)
+  
+  read.csv("${aggregated}/annealingParameters.csv.gz") %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    ggplot(aes(x = round, y = value, colour = chain, group = chain)) +
+      geom_line()  + 
+      facet_grid(model~method, scales = "free_y") +
+      scale_y_log10() +
+      theme_minimal()
+  ggsave("annealingParameters.pdf", width = 10, height = 15)
   """
   
 }

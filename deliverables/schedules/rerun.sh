@@ -27,4 +27,4 @@ df %>%
     geom_line() + 
     facet_wrap(~model) +
     theme_minimal()
-ggsave("annealingSchedules.pdf", width = 10, height = 5)
+ggsave("annealingSchedules.pdf", width = 10, height = 10, limitsize = FALSE)

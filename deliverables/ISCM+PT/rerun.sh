@@ -8,7 +8,7 @@ read.csv("aggregated/multiRoundPropagation.csv.gz") %>%
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   ggplot(aes(x = iteration, y = ess)) +
     geom_line()  + 
-    facet_grid(model~round, scales = "free") +
+    facet_grid(model~round, scales = "free_y") +
     theme_bw()
 ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
 
@@ -19,7 +19,7 @@ read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   mutate(method = str_replace(method, ".*[.]", "")) %>% 
-  ggplot(aes(x = beta, y = value, colour = method)) +
+  ggplot(aes(x = beta, y = value, colour = method, linetype = method)) +
     geom_line()  + 
     scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
     facet_wrap(~model, scales = "free_y") +
@@ -44,7 +44,7 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   mutate(method = str_replace(method, ".*[.]", "")) %>% 
-  ggplot(aes(x = time, y = value, colour = method)) +
+  ggplot(aes(x = time, y = value, colour = method, linetype = method)) +
     geom_line()  + 
     scale_x_log10() +
     facet_wrap(~model, scales = "free_y") +

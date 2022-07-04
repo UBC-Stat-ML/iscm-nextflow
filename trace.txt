@@ -23,3 +23,6 @@ task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	rss	vmem	r
 14	07/6d4abc	3853536.pbsha.ib.sockeye	runBlang (13)	COMPLETED	0	2022-07-04 04:41:50.805	1h 18m 24s	1h 13m 12s	544.1%	12.1 GB	54.4 GB	13.5 MB	104.4 KB
 20	c0/add665	3853553.pbsha.ib.sockeye	runBlang (19)	COMPLETED	0	2022-07-04 04:41:53.155	2h 40m 23s	2h 23m 47s	567.7%	23.3 GB	54.5 GB	13.2 MB	96.8 KB
 22	f9/ae5fc3	3853551.pbsha.ib.sockeye	runBlang (21)	COMPLETED	0	2022-07-04 04:41:52.910	3h 52m 28s	3h 41m 10s	588.7%	13.2 GB	54.5 GB	13.2 MB	120.6 KB
+24	a3/a9083d	3853555.pbsha.ib.sockeye	runBlang (23)	COMPLETED	0	2022-07-04 04:41:53.402	6h 50m 37s	6h 31m 4s	617.3%	19.4 GB	54.5 GB	14.4 MB	170.1 KB
+26	2b/28cb3e	3859355.pbsha.ib.sockeye	aggregate	COMPLETED	0	2022-07-04 11:32:30.972	38.4s	6.9s	31.0%	82.7 MB	4.4 GB	10 MB	268.7 KB
+27	09/8700f9	3859357.pbsha.ib.sockeye	plot	COMPLETED	0	2022-07-04 11:33:09.491	24.9s	10.2s	53.6%	75.4 MB	267.5 MB	10.7 MB	433 B

@@ -1,0 +1,12 @@
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_16/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_2/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_4/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_8/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_20/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_6/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_13/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_19/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_11/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_17/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_7/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /scratch/st-alexbou-1/iscm-nextflow/work/a4/4bc0f10c83f6bb2cf59c6dabbdd6b2/exec_1/multiRoundPropagation.csv.gz does not exists, skipping this exec.

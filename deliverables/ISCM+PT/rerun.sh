@@ -12,7 +12,11 @@ read.csv("aggregated/multiRoundPropagation.csv.gz") %>%
     theme_minimal()
 ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
 
-timings <- read.csv("aggregated/roundTimings.csv.gz")
+timings <- read.csv("aggregated/roundTimings.csv.gz") %>%
+  group_by(model, method) %>%
+  mutate(value = cumsum(value))
+
+
 
 read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
   filter(isAdapt == "false") %>%

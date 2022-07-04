@@ -4,13 +4,13 @@ Some updates on the project.
 
 I ran the ISCM algorithm on a larger array of models, in particular realistic Bayesian ones. An interesting problem came up---2 'catastrophic failures---, I developed a workaround that seems to address the failures but still leaves room for further improvements.
 
-In the attached zip, decompress and start by looking at the subfolder 'basic'. The organization of the results is the same as last time.
+In the attached zip, decompress and start by looking at the subfolder 'basic'. You can find in ISCM+PT the comparisons with NRPT, and in schedules, comparisons with standard adaptive SMC. 
 
 In basic/ISCM+PT/logNormalizationConstantProgress.pdf you can see that ISCM fails badly in 2 of the 12 problems, namely PhylogeneticTree and SpikeSlabClassification. 
 
-After some investigation, the root cause is that the weight in the very first iteration have such a huge range that the variance is either undefined or numerically unstable to compute. This is the case both with the algorithm discussed last time based on SD[V_beta], but also with an equivalent but more numerically robust implementation based on SD[incremental weight] = SD[(delta beta) * V_beta] -- i.e. the problem is more fundamental than just something that can be solved by a simple rescaling. As soon as beta > 0, I did not encounter such problems.
+After some investigation, the root cause is that the weight in the very first iteration have such a huge range that the variance is either undefined or numerically unstable to compute. This is the case both with the algorithm discussed last time based on SD[V_beta], but also with an equivalent but more numerically robust implementation based on SD[incremental weight] = SD[(delta beta) * V_beta] -- i.e. the problem is more fundamental than just something that can be solved by a simple rescaling. [the result are shown for the latter in 'basic'] As soon as beta > 0, I did not encounter such problems, it is only for beta = 0...
 
-And indeed after some thoughts the very first iteration is somehow special. Indeed, when the prior is proper, and the likelihood bounded above, it is not hard to show that for all beta in (0, 1], V_beta has a moment generating function defined in the neighbourhood of beta, and hence V_beta has all the moments. In contrast, this is not guaranteed at beta = 0. 
+And indeed after some thoughts the very first iteration is somehow special. Indeed, when the prior is proper, and the likelihood bounded above, it is not hard to show that for all beta in (0, 1], V_beta has a moment generating function defined in the neighbourhood of beta, and hence V_beta has all the moments. In contrast, this is not guaranteed at beta = 0! 
 
 In PT this problem is not as visible since the rejections are bounded by one, so even if there is bad behaviour of V_beta at beta=0, it does not affect the schedule estimators too badly (also we need one less moment compared to SMC). 
 

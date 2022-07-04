@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from '1f1d46ce2a3de940f5b6261734ed3c35b34f35db'
+    val codeRevision from 'ea6ab519c9f7820b7b1c1b9f54ad86d4d292969e'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -44,7 +44,7 @@ process runBlang {
                      '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 
                      
-    each method from '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.nParticles 20',
+    each method from '--engine iscm.ISCM --engine.resamplingTriggeredRejuvenation true --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 2 --engine.nRounds 15 --engine.nParticles 20',
                      '--engine PT --engine.nScans 10000 --engine.nChains 20'    
 
     file code

@@ -50,6 +50,7 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
   ggplot(aes(x = time, y = value, colour = method, linetype = method)) +
     geom_line()  + 
     scale_x_log10() +
+    xlab("time (ms)") +
     facet_wrap(~model, scales = "free_y") +
     theme_minimal()
 ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 10, limitsize = FALSE)

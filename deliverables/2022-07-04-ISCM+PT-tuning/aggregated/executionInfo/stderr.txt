@@ -1,0 +1,2 @@
+File /Users/bouchard/experiments/iscm-nextflow/work/7e/168f839b4cd9e8debb9379f912b96c/exec_1/multiRoundPropagation.csv.gz does not exists, skipping this exec.
+File /Users/bouchard/experiments/iscm-nextflow/work/7e/168f839b4cd9e8debb9379f912b96c/exec_2/multiRoundPropagation.csv.gz does not exists, skipping this exec.

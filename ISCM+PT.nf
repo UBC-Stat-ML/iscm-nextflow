@@ -88,7 +88,7 @@ process aggregate {
         annealingParameters.csv.gz \
         roundTimings.csv.gz \
         multiRoundPropagation.csv.gz \
-        energyExplCorrelation.csv \
+        energyExplCorrelation.csv.gz \
     --keys \
       engine as method \
       model \

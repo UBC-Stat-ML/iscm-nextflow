@@ -88,6 +88,7 @@ process aggregate {
         annealingParameters.csv.gz \
         roundTimings.csv.gz \
         multiRoundPropagation.csv.gz \
+        energyExplCorrelation.csv \
     --keys \
       engine as method \
       model \
@@ -137,6 +138,17 @@ process plot {
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
   ggsave("lambdaInstantaneous.pdf", width = 10, height = 5, limitsize = FALSE)
+  
+  read.csv("${aggregated}/energyExplCorrelation.csv.gz") %>%
+    filter(isAdapt == "false") %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    ggplot(aes(x = beta, y = value, colour = method, linetype = method)) +
+      geom_line()  + 
+      facet_wrap(~model, scales = "free_y") +
+      theme_minimal()
+  ggsave("energyExplCorrelation.pdf", width = 10, height = 5, limitsize = FALSE)
   
   read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 

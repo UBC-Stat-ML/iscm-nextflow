@@ -1,5 +1,5 @@
 keys	engine as method model from arguments.tsv
-dataPathInEachExecFolder	lambdaInstantaneous.csv.gz logNormalizationConstantProgress.csv.gz annealingParameters.csv.gz roundTimings.csv.gz multiRoundPropagation.csv.gz
+dataPathInEachExecFolder	lambdaInstantaneous.csv.gz logNormalizationConstantProgress.csv.gz annealingParameters.csv.gz roundTimings.csv.gz multiRoundPropagation.csv.gz energyExplCorrelation.csv.gz
 execFoldersPrefix	exec_
 experimentConfigs.managedExecutionFolder	true
 experimentConfigs.saveStandardStreams	true

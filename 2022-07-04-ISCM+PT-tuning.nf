@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from '6698f6dd31f0ba32ab4a17b7d5be6077e25e6e69'
+    val codeRevision from '90d587f1f4dea213d5dd5668831164dfd5c4efac'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -30,8 +30,9 @@ process runBlang {
 
   input:
                      
-    each model from  '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA'
-                 /*  '--model blang.validation.internals.fixtures.Ising --model.beta 1',
+    each model from  '--model hier.HierarchicalRockets --model.data data/failure_counts.csv' 
+                 /*  '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
+                     '--model blang.validation.internals.fixtures.Ising --model.beta 1',
                      '--model demos.DiscreteMultimodal',
                      '--model demos.AnnealedMVN',
                      '--model demos.UnidentifiableProduct',
@@ -40,12 +41,11 @@ process runBlang {
                      '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
                      '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
                      '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
-                     '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
                      '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
                   */
                      
-    each method from '--engine iscm.ISCM --engine.resamplingTriggeredRejuvenation true --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 8 --engine.nParticles 20',
-                     '--engine iscm.ISCM --engine.resamplingTriggeredRejuvenation true --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 8 --engine.nParticles 100',
+    each method from '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.nRounds 8 --engine.initialNumberOfSMCIterations 3 --engine.nParticles 20',
+                     '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.nRounds 8 --engine.initialNumberOfSMCIterations 7 --engine.nParticles 7',
                      '--engine PT --engine.nScans 2000 --engine.nChains 20'    
 
     each seed from 1..2

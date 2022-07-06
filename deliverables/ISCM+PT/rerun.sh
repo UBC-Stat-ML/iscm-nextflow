@@ -16,7 +16,6 @@ timings <- read.csv("aggregated/roundTimings.csv.gz") %>%
   group_by(model, method) %>%
   mutate(value = cumsum(value))
 
-
 read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
   filter(isAdapt == "false") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 

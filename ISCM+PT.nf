@@ -188,7 +188,10 @@ process plot {
       theme_minimal()
   ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
   
-  df <- read.csv("${aggregated}/multiRoundPropagation.csv.gz")
+  df <- read.csv("${aggregated}/multiRoundPropagation.csv.gz") %>%
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    filter(method == "ISCM")
+    
   max_round <- max(df\$round)
   df <- df %>%
     filter(round == max_round) 

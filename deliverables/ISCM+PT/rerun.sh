@@ -75,3 +75,14 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
     scale_y_log10() +
     theme_minimal()
 ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
+
+read.csv("aggregated/annealingParameters.csv.gz") %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  mutate(method = str_replace(method, ".*[.]", "")) %>%
+  filter(isAdapt == "false") %>% 
+  ggplot(aes(x = chain, y = value)) +
+    geom_line()  + 
+    facet_grid(model~method) +
+    theme_minimal()
+ggsave("annealingParameters-final.pdf", width = 10, height = 30, limitsize = FALSE)

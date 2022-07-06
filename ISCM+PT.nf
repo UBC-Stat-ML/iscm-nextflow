@@ -89,6 +89,7 @@ process aggregate {
         roundTimings.csv.gz \
         multiRoundPropagation.csv.gz \
         energyExplCorrelation.csv.gz \
+        multiRoundPropagation.csv.gz \
     --keys \
       engine as method \
       model \
@@ -186,6 +187,30 @@ process plot {
       scale_y_log10() +
       theme_minimal()
   ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
+  
+  mrp <- read.csv("${aggregated}/multiRoundPropagation.csv.gz")
+  max_round <- max(mrp\$round)
+  mrp <- mrp %>%
+    filter(round == max_round) 
+    
+  
+  maxIter <- df %>%
+    group_by(method, model) %>%
+    summarize(max_iter = max(iteration))
+    
+  df <- df %>% 
+    inner_join(maxIter) %>%
+    mutate(relative_iter = iteration/max_iter)
+  
+  df %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    ggplot(aes(x = relative_iter, y = annealingParameter, linetype = method, color = method)) +
+      geom_line(alpha = 0.8) + 
+      facet_wrap(~model) +
+      theme_minimal()
+  ggsave("annealingSchedules.pdf", width = 10, height = 10, limitsize = FALSE)
   """
   
 }

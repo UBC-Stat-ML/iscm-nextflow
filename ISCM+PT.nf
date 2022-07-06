@@ -144,9 +144,9 @@ process plot {
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>% 
-    ggplot(aes(x = beta, y = value, colour = method, linetype = method)) +
+    ggplot(aes(x = beta, y = value)) +
       geom_line()  + 
-      facet_wrap(~model, scales = "free_y") +
+      facet_wrap(~model) +
       theme_minimal()
   ggsave("energyExplCorrelation.pdf", width = 10, height = 5, limitsize = FALSE)
   

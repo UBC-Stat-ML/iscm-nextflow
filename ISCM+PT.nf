@@ -187,16 +187,31 @@ process plot {
       theme_minimal()
   ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
   
-  read.csv("${aggregated}/annealingParameters.csv.gz") %>%
-    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+  read.csv("aggregated/annealingParameters.csv.gz") %>%
+    mutate(model = str_replace(model, "[$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>%
     filter(isAdapt == "false") %>% 
+    filter(method == "ISCM") %>%
     ggplot(aes(x = chain, y = value)) +
       geom_line()  + 
-      facet_grid(model~method) +
+      facet_grid(method~model, scales = "free_x") +
       theme_minimal()
-  ggsave("annealingParameters-final.pdf", width = 10, height = 30, limitsize = FALSE)
+  ggsave("annealingParameters-final.pdf", width = 30, height = 5, limitsize = FALSE)
+
+  read.csv("aggregated/annealingParameters.csv.gz") %>%
+    mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    mutate(method = str_replace(method, ".*[.]", "")) %>%
+    filter(isAdapt == "false") %>% 
+    filter(method == "ISCM") %>%
+    ggplot(aes(x = chain, y = value)) +
+      geom_line()  + 
+      scale_y_log10() +
+      facet_grid(method~model, scales = "free_x") +
+      theme_minimal()
+  ggsave("annealingParameters-log-final.pdf", width = 30, height = 5, limitsize = FALSE)
+
   """
   
 }

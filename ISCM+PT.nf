@@ -89,7 +89,6 @@ process aggregate {
         roundTimings.csv.gz \
         multiRoundPropagation.csv.gz \
         energyExplCorrelation.csv.gz \
-        multiRoundPropagation.csv.gz \
     --keys \
       engine as method \
       model \
@@ -188,32 +187,16 @@ process plot {
       theme_minimal()
   ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
   
-  df <- read.csv("${aggregated}/multiRoundPropagation.csv.gz") %>%
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
-    filter(method == "ISCM")
-    
-  max_round <- max(df\$round)
-  df <- df %>%
-    filter(round == max_round) 
-    
-  
-  maxIter <- df %>%
-    group_by(method, model) %>%
-    summarize(max_iter = max(iteration))
-    
-  df <- df %>% 
-    inner_join(maxIter) %>%
-    mutate(relative_iter = iteration/max_iter)
-  
-  df %>%
+  read.csv("${aggregated}/annealingParameters.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
-    ggplot(aes(x = relative_iter, y = annealingParameter, linetype = method, color = method)) +
-      geom_line(alpha = 0.8) + 
-      facet_wrap(~model) +
+    mutate(method = str_replace(method, ".*[.]", "")) %>%
+    filter(isAdapt == "false") %>% 
+    ggplot(aes(x = chain, y = value)) +
+      geom_line()  + 
+      facet_grid(model~method) +
       theme_minimal()
-  ggsave("annealingSchedules.pdf", width = 10, height = 10, limitsize = FALSE)
+  ggsave("annealingParameters-final.pdf", width = 10, height = 30, limitsize = FALSE)
   """
   
 }

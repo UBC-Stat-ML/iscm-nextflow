@@ -187,8 +187,8 @@ process plot {
       theme_minimal()
   ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
   
-  read.csv("aggregated/annealingParameters.csv.gz") %>%
-    mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  read.csv("${aggregated}/annealingParameters.csv.gz") %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>%
     filter(isAdapt == "false") %>% 
@@ -199,8 +199,8 @@ process plot {
       theme_minimal()
   ggsave("annealingParameters-final.pdf", width = 30, height = 5, limitsize = FALSE)
 
-  read.csv("aggregated/annealingParameters.csv.gz") %>%
-    mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  read.csv("${aggregated}/annealingParameters.csv.gz") %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>%
     filter(isAdapt == "false") %>% 

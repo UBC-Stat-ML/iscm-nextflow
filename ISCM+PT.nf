@@ -66,6 +66,8 @@ process runBlang {
   mkdir output
   mv results/latest/monitoring/*.csv.gz output
   mv results/latest/*.tsv output
+  mv results/latest/executionInfo/stdout.txt output
+  mv results/latest/executionInfo/stderr.txt output
   """
 }
 

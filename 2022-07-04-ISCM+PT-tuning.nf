@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from '90d587f1f4dea213d5dd5668831164dfd5c4efac'
+    val codeRevision from '79306421a196247894a0f424d710dfa88b02eaf9'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -30,9 +30,9 @@ process runBlang {
 
   input:
                      
-    each model from  '--model hier.HierarchicalRockets --model.data data/failure_counts.csv' 
-                 /*  '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
-                     '--model blang.validation.internals.fixtures.Ising --model.beta 1',
+    each model from  '--model blang.validation.internals.fixtures.Ising --model.beta 1'
+                 /*  '--model hier.HierarchicalRockets --model.data data/failure_counts.csv',
+                     '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
                      '--model demos.DiscreteMultimodal',
                      '--model demos.AnnealedMVN',
                      '--model demos.UnidentifiableProduct',
@@ -45,7 +45,7 @@ process runBlang {
                   */
                      
     each method from '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.nRounds 8 --engine.initialNumberOfSMCIterations 3 --engine.nParticles 20',
-                     '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.nRounds 8 --engine.initialNumberOfSMCIterations 7 --engine.nParticles 7',
+                     '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.nRounds 8 --engine.initialNumberOfSMCIterations 3 --engine.nParticles 2',
                      '--engine PT --engine.nScans 2000 --engine.nChains 20'    
 
     each seed from 1..2

@@ -80,9 +80,9 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   mutate(method = str_replace(method, ".*[.]", "")) %>%
+  filter(isAdapt == "false") %>% 
   filter(method == "ISCM") %>%
-  filter(round > 5) %>%
-  ggplot(aes(x = chain, y = value, colour = round, group = round)) +
+  ggplot(aes(x = chain, y = value)) +
     geom_line()  + 
     facet_grid(method~model, scales = "free_x") +
     theme_minimal()
@@ -92,9 +92,9 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   mutate(method = str_replace(method, ".*[.]", "")) %>%
+  filter(isAdapt == "false") %>% 
   filter(method == "ISCM") %>%
-  filter(round > 5) %>%
-  ggplot(aes(x = chain, y = value, colour = round, group = round)) +
+  ggplot(aes(x = chain, y = value)) +
     geom_line()  + 
     scale_y_log10() +
     facet_grid(method~model, scales = "free_x") +

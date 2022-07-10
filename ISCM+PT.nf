@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from '3a4d9b747964537d63a544677340f3b0027ae0da'
+    val codeRevision from 'e2025ed7de18e45ee71612f7ea4cef45f4337eb9'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -22,6 +22,30 @@ process buildCode {
 
 nCPUs = 5
 
+params.dryRun = false
+
+models = [
+   '--model blang.validation.internals.fixtures.Ising --model.beta 1',
+   '--model demos.DiscreteMultimodal',
+   '--model demos.AnnealedMVN',
+   '--model demos.UnidentifiableProduct',
+   '--model demos.XY',
+   '--model demos.ToyMix',
+   '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
+   '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
+   '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
+   '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
+   '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
+   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
+]
+
+nRounds = 20
+if (params.dryRun) {
+  nRounds = 5
+  models = models.subList(0, 1)
+}
+
+
 process runBlang {
   time '10h'  
   cpus nCPUs
@@ -30,22 +54,10 @@ process runBlang {
 
   input:
                      
-    each model from  '--model blang.validation.internals.fixtures.Ising --model.beta 1',
-                     '--model demos.DiscreteMultimodal',
-                     '--model demos.AnnealedMVN',
-                     '--model demos.UnidentifiableProduct',
-                     '--model demos.XY',
-                     '--model demos.ToyMix',
-                     '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
-                     '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
-                     '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
-                     '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
-                     '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
-                     '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
-
+    each model from  models
                      
-    each method from '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles 20',
-                     '--engine PT --engine.nScans 10000 --engine.nChains 20'    
+    each method from '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--engine PT --engine.initialization FORWARD --engine.nScans 10000 --engine.nChains ' + nRounds    
 
     file code
     file data
@@ -127,7 +139,8 @@ process plot {
   
   timings <- read.csv("${aggregated}/roundTimings.csv.gz") %>%
     group_by(model, method) %>%
-    mutate(value = cumsum(value))
+    mutate(value = cumsum(value)) %>%
+    mutate(nExplorationSteps = cumsum(nExplorationSteps))
   
   read.csv("${aggregated}/lambdaInstantaneous.csv.gz") %>%
     filter(isAdapt == "false") %>%
@@ -162,6 +175,20 @@ process plot {
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
   ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 10, limitsize = FALSE)
+  
+  read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
+    inner_join(timings, by = c("model", "method", "round")) %>% 
+    rename(value = value.x) %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
+      geom_line()  + 
+      scale_x_log10() +
+      xlab("time (ms)") +
+      facet_wrap(~model, scales = "free_y") +
+      theme_minimal()
+  ggsave("logNormalizationConstantProgress-by-nExpl.pdf", width = 10, height = 10, limitsize = FALSE)
   
   read.csv("${aggregated}/logNormalizationConstantProgress.csv.gz") %>%
     inner_join(timings, by = c("model", "method", "round")) %>% 

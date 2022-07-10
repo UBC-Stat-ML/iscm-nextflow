@@ -14,7 +14,8 @@ ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limits
 
 timings <- read.csv("aggregated/roundTimings.csv.gz") %>%
   group_by(model, method) %>%
-  mutate(value = cumsum(value))
+  mutate(value = cumsum(value)) %>%
+  mutate(nExplorationSteps = cumsum(nExplorationSteps))
 
 read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
   filter(isAdapt == "false") %>%
@@ -49,6 +50,20 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
     facet_wrap(~model, scales = "free_y") +
     theme_minimal()
 ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 10, limitsize = FALSE)
+
+read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+  inner_join(timings, by = c("model", "method", "round")) %>% 
+  rename(value = value.x) %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  mutate(method = str_replace(method, ".*[.]", "")) %>% 
+  ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
+    geom_line()  + 
+    scale_x_log10() +
+    xlab("time (ms)") +
+    facet_wrap(~model, scales = "free_y") +
+    theme_minimal()
+ggsave("logNormalizationConstantProgress-by-nExpl.pdf", width = 10, height = 10, limitsize = FALSE)
 
 read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
   inner_join(timings, by = c("model", "method", "round")) %>% 

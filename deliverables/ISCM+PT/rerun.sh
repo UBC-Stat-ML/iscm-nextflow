@@ -12,6 +12,20 @@ read.csv("aggregated/multiRoundPropagation.csv.gz") %>%
     theme_minimal()
 ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
 
+
+read.csv("aggregated/roundTimings.csv.gz") %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  mutate(method = str_replace(method, ".*[.]", "")) %>% 
+  ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
+    geom_line() +
+    scale_x_log10() +
+    scale_y_log10() +
+    facet_wrap(~model) +
+    theme_minimal()
+ggsave("timings.pdf", width = 10, height = 5, limitsize = FALSE)
+
+
 timings <- read.csv("aggregated/roundTimings.csv.gz") %>%
   group_by(model, method) %>%
   mutate(value = cumsum(value)) %>%

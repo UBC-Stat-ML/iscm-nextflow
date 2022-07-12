@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from 'b6a231dd6df921a5c1a9fbf0870bf88a52fb7cff'
+    val codeRevision from '36b44532a4c071a11cb2527b7210e56c3ab656d4'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code

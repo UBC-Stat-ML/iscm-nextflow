@@ -239,7 +239,8 @@ process plot {
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>%
     filter(isAdapt == "false") %>% 
-    ggplot(aes(x = chain, y = value, colour = chain, group = chain)) +
+    filter(method == "ISCM") %>%
+    ggplot(aes(x = chain, y = value)) +
       geom_line()  + 
       facet_grid(method~model, scales = "free_x") +
       theme_minimal()
@@ -250,7 +251,8 @@ process plot {
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>%
     filter(isAdapt == "false") %>% 
-    ggplot(aes(x = chain, y = value, colour = chain, group = chain)) +
+    filter(method == "ISCM") %>%
+    ggplot(aes(x = chain, y = value)) +
       geom_line()  + 
       scale_y_log10() +
       facet_grid(method~model, scales = "free_x") +

@@ -81,6 +81,22 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
     theme_minimal()
 ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 10, limitsize = FALSE)
 
+read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+  inner_join(timings, by = c("model", "method", "round")) %>% 
+  rename(time = value.y) %>%
+  rename(value = value.x) %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  mutate(method = str_replace(method, ".*[.]", "")) %>% 
+  filter(round > 2) %>%
+  ggplot(aes(x = time, y = value, colour = method, linetype = method)) +
+    geom_line()  + 
+    scale_x_log10() +
+    xlab("time (ms)") +
+    facet_wrap(~model, scales = "free_y") +
+    theme_minimal()
+ggsave("logNormalizationConstantProgress-suffix.pdf", width = 10, height = 10, limitsize = FALSE)
+
 read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
@@ -97,8 +113,7 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   mutate(method = str_replace(method, ".*[.]", "")) %>%
   filter(isAdapt == "false") %>% 
-  filter(method == "ISCM") %>%
-  ggplot(aes(x = chain, y = value)) +
+  ggplot(aes(x = chain, y = value, colour = chain, group = chain)) +
     geom_line()  + 
     facet_grid(method~model, scales = "free_x") +
     theme_minimal()
@@ -109,8 +124,7 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   mutate(method = str_replace(method, ".*[.]", "")) %>%
   filter(isAdapt == "false") %>% 
-  filter(method == "ISCM") %>%
-  ggplot(aes(x = chain, y = value)) +
+  ggplot(aes(x = chain, y = value, colour = chain, group = chain)) +
     geom_line()  + 
     scale_y_log10() +
     facet_grid(method~model, scales = "free_x") +

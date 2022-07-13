@@ -132,7 +132,8 @@ process plot {
   read.csv("${aggregated}/multiRoundPropagation.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    ggplot(aes(x = iteration, y = ess)) +
+    mutate(method = str_replace(method, ".*[.]", "")) %>% 
+    ggplot(aes(x = iteration, y = ess, colour = method, linetype = method)) +
       geom_line()  + 
       facet_grid(model~round, scales = "free") +
       theme_minimal()

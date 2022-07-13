@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from '79306421a196247894a0f424d710dfa88b02eaf9'
+    val codeRevision from '72362299cc3ec3bae8563fa138cb3ba6b8ad3b83'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -45,7 +45,7 @@ process runBlang {
                   */
                      
     each method from '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.nRounds 8 --engine.initialNumberOfSMCIterations 3 --engine.nParticles 20',
-                     '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.nRounds 8 --engine.initialNumberOfSMCIterations 3 --engine.nParticles 2',
+                     '--engine iscm.ISCM --engine.usePosteriorSamplingScan false --engine.nRounds 8 --engine.initialNumberOfSMCIterations 75 --engine.nParticles 20',
                      '--engine PT --engine.nScans 2000 --engine.nChains 20'    
 
     each seed from 1..2

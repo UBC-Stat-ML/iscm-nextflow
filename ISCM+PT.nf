@@ -103,6 +103,8 @@ process aggregate {
         annealingParameters.csv.gz \
         roundTimings.csv.gz \
         multiRoundPropagation.csv.gz \
+        multiRoundResampling.csv.gz \
+        predictedResamplingInterval.csv.gz \
         energyExplCorrelation.csv.gz \
     --keys \
       engine as method \

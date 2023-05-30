@@ -56,10 +56,10 @@ process runBlang {
                      
     each model from  models
                      
-    each method from '--experimentConfigs.description IAIS     --engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description ISCM-50  --engine iscm.ISCM --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description ISCM-100 --engine iscm.ISCM --engine.resamplingESSThreshold 1.0 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description PT       --engine PT --engine.initialization FORWARD --engine.nScans 10000 --engine.nChains ' + nRounds    
+    each method from '--experimentConfigs.description IAIS --engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description ISCM --engine iscm.ISCM --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description ISCM-always-resamp --engine iscm.ISCM --engine.resamplingESSThreshold 1.0 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description PT --engine PT --engine.initialization FORWARD --engine.nScans 10000 --engine.nChains ' + nRounds    
 
     file code
     file data
@@ -135,7 +135,6 @@ process plot {
   read.csv("aggregated/multiRoundPropagation.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     ggplot(aes(x = iteration, y = ess, colour = method, linetype = method)) +
       geom_line()  + 
       facet_grid(model~round, scales = "free") +
@@ -145,13 +144,11 @@ process plot {
   preds <- read.csv("aggregated/predictedResamplingInterval.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     filter(method == "ISCM")
   preds\$type <- 'predicted'
   actuals <- read.csv("aggregated/multiRoundResampling.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     filter(method == "ISCM") %>%
     rename(value = deltaIterations)
   actuals\$type <- 'actual'
@@ -173,7 +170,6 @@ process plot {
     filter(isAdapt == "false") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     ggplot(aes(x = beta, y = value, colour = method, linetype = method)) +
       geom_line()  + 
       scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
@@ -185,7 +181,6 @@ process plot {
     filter(isAdapt == "false") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     ggplot(aes(x = beta, y = value)) +
       geom_line()  + 
       facet_wrap(~model) +
@@ -195,7 +190,6 @@ process plot {
   read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     ggplot(aes(x = round, y = value, colour = method)) +
       geom_line()  + 
       scale_x_log10() +
@@ -208,7 +202,6 @@ process plot {
     rename(value = value.x) %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
       geom_line()  + 
       scale_x_log10() +
@@ -223,7 +216,6 @@ process plot {
     rename(value = value.x) %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     ggplot(aes(x = time, y = value, colour = method, linetype = method)) +
       geom_line()  + 
       scale_x_log10() +
@@ -238,7 +230,6 @@ process plot {
     rename(value = value.x) %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     filter(round > 2) %>%
     ggplot(aes(x = time, y = value, colour = method, linetype = method)) +
       geom_line()  + 
@@ -251,7 +242,6 @@ process plot {
   read.csv("aggregated/annealingParameters.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>% 
     ggplot(aes(x = round, y = value, colour = chain, group = chain)) +
       geom_line()  + 
       facet_grid(model~method, scales = "free_y") +
@@ -262,7 +252,7 @@ process plot {
   read.csv("aggregated/annealingParameters.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>%
+    mutate(method = method) %>%
     filter(isAdapt == "false") %>% 
     filter(method == "ISCM") %>%
     ggplot(aes(x = chain, y = value)) +
@@ -274,7 +264,7 @@ process plot {
   read.csv("aggregated/annealingParameters.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = str_replace(method, ".*[.]", "")) %>%
+    mutate(method = method) %>%
     filter(isAdapt == "false") %>% 
     filter(method == "ISCM") %>%
     ggplot(aes(x = chain, y = value)) +

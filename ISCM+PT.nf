@@ -124,7 +124,7 @@ process plot {
   output:
     file '*.*'
     file 'aggregated'   
-  afterScript 'rm Rplots.pdf; cp .command.sh rerun.sh'  
+  afterScript 'rm Rplots.pdf; cp .command.sh rerun.sh'
   """
   #!/usr/bin/env Rscript
   require("ggplot2")
@@ -142,13 +142,13 @@ process plot {
   ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
   
   preds <- read.csv("aggregated/predictedResamplingInterval.csv.gz") %>%
-    mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>% 
     filter(method == "ISCM")
   preds\$type <- 'predicted'
   actuals <- read.csv("aggregated/multiRoundResampling.csv.gz") %>%
-    mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     mutate(method = str_replace(method, ".*[.]", "")) %>% 
     filter(method == "ISCM") %>%

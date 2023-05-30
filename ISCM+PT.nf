@@ -56,9 +56,10 @@ process runBlang {
                      
     each model from  models
                      
-    each method from '--engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--engine iscm.ISCM --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--engine PT --engine.initialization FORWARD --engine.nScans 10000 --engine.nChains ' + nRounds    
+    each method from '--experimentConfigs.description IAIS     --engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description ISCM-50  --engine iscm.ISCM --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description ISCM-100 --engine iscm.ISCM --engine.resamplingESSThreshold 1.0 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description PT       --engine PT --engine.initialization FORWARD --engine.nScans 10000 --engine.nChains ' + nRounds    
 
     file code
     file data
@@ -107,7 +108,7 @@ process aggregate {
         predictedResamplingInterval.csv.gz \
         energyExplCorrelation.csv.gz \
     --keys \
-      engine as method \
+      experimentConfigs.description as method \
       model \
            from arguments.tsv
   mv results/latest results/aggregated

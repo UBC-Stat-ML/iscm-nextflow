@@ -6,12 +6,31 @@ require("stringr")
 read.csv("aggregated/multiRoundPropagation.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>% 
   ggplot(aes(x = iteration, y = ess, colour = method, linetype = method)) +
     geom_line()  + 
     facet_grid(model~round, scales = "free") +
     theme_minimal()
 ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
+
+preds <- read.csv("aggregated/predictedResamplingInterval.csv.gz") %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  filter(method == "ISCM")
+preds$type <- 'predicted'
+actuals <- read.csv("aggregated/multiRoundResampling.csv.gz") %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  filter(method == "ISCM") %>%
+  rename(value = deltaIterations)
+actuals$type <- 'actual'
+
+actuals %>%
+  full_join(preds, by = c("model", "method", "round", "type", "value")) %>%
+  ggplot(aes(x = round, y = value, colour = type)) +
+    geom_point() + 
+    facet_wrap(~model) +
+    theme_minimal()
+ggsave("preds.pdf", width = 10, height = 5, limitsize = FALSE)
 
 timings <- read.csv("aggregated/roundTimings.csv.gz") %>%
   group_by(model, method) %>%
@@ -22,7 +41,6 @@ read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
   filter(isAdapt == "false") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>% 
   ggplot(aes(x = beta, y = value, colour = method, linetype = method)) +
     geom_line()  + 
     scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
@@ -34,7 +52,6 @@ read.csv("aggregated/energyExplCorrelation.csv.gz") %>%
   filter(isAdapt == "false") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>% 
   ggplot(aes(x = beta, y = value)) +
     geom_line()  + 
     facet_wrap(~model) +
@@ -44,7 +61,6 @@ ggsave("energyExplCorrelation.pdf", width = 10, height = 5, limitsize = FALSE)
 read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>% 
   ggplot(aes(x = round, y = value, colour = method)) +
     geom_line()  + 
     scale_x_log10() +
@@ -57,7 +73,6 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
   rename(value = value.x) %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>% 
   ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
     geom_line()  + 
     scale_x_log10() +
@@ -72,7 +87,6 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
   rename(value = value.x) %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>% 
   ggplot(aes(x = time, y = value, colour = method, linetype = method)) +
     geom_line()  + 
     scale_x_log10() +
@@ -87,7 +101,6 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
   rename(value = value.x) %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>% 
   filter(round > 2) %>%
   ggplot(aes(x = time, y = value, colour = method, linetype = method)) +
     geom_line()  + 
@@ -100,7 +113,6 @@ ggsave("logNormalizationConstantProgress-suffix.pdf", width = 10, height = 10, l
 read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>% 
   ggplot(aes(x = round, y = value, colour = chain, group = chain)) +
     geom_line()  + 
     facet_grid(model~method, scales = "free_y") +
@@ -111,7 +123,7 @@ ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
 read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>%
+  mutate(method = method) %>%
   filter(isAdapt == "false") %>% 
   filter(method == "ISCM") %>%
   ggplot(aes(x = chain, y = value)) +
@@ -123,7 +135,7 @@ ggsave("annealingParameters-final.pdf", width = 30, height = 5, limitsize = FALS
 read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = str_replace(method, ".*[.]", "")) %>%
+  mutate(method = method) %>%
   filter(isAdapt == "false") %>% 
   filter(method == "ISCM") %>%
   ggplot(aes(x = chain, y = value)) +

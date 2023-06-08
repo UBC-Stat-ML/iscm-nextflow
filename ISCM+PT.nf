@@ -104,7 +104,6 @@ process aggregate {
         logNormalizationConstantProgress.csv.gz \
         annealingParameters.csv.gz \
         roundTimings.csv.gz \
-        multiRoundPropagation.csv.gz \
         multiRoundResampling.csv.gz \
         predictedResamplingInterval.csv.gz \
         energyExplCorrelation.csv.gz \
@@ -133,14 +132,6 @@ process plot {
   require("dplyr")
   require("stringr")
   
-  read.csv("aggregated/multiRoundPropagation.csv.gz") %>%
-    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
-    mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    ggplot(aes(x = iteration, y = ess, colour = method, linetype = method)) +
-      geom_line()  + 
-      facet_grid(model~round, scales = "free") +
-      theme_minimal()
-  ggsave("multiRoundPropagation-by-iteration.pdf", width = 35, height = 20, limitsize = FALSE)
   
   preds <- read.csv("aggregated/predictedResamplingInterval.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 

@@ -59,7 +59,7 @@ process runBlang {
                      
     each method from '--experimentConfigs.description IAIS --engine iscm.IAIS --engine.normalizationConstantMode true --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
                      '--experimentConfigs.description ISCM --engine iscm.ISCM --engine.normalizationConstantMode true --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description ISCM-high-resamp --engine iscm.ISCM --engine.resamplingESSThreshold 0.9 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description ISCM-high-resamp --engine iscm.ISCM --engine.normalizationConstantMode true --engine.resamplingESSThreshold 0.9 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
                      '--experimentConfigs.description PT --engine PT --engine.initialization FORWARD --engine.nScans 10000 --engine.nChains ' + nRounds    
 
     file code

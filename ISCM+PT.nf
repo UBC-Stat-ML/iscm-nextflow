@@ -9,18 +9,19 @@ process buildCode {
   executor 'local'
   cache true 
   input:
-    val gitRepoName from 'ptanalysis'
+    val gitRepoName from 'ptanalysis_internal'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from '36b44532a4c071a11cb2527b7210e56c3ab656d4'
+    val codeRevision from 'f3dbeea54b57035bacd9eaabfdc53e7e0a2d9b21'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
-    file 'ptanalysis/data' into data
+    file 'ptanalysis_internal/data' into data
   script:
     template 'buildRepo.sh' // for quick prototyping, switch to 'buildSnapshot', and set cache to false above
 }
 
-nCPUs = 5
+// for this one it makes most sense to set n cpu = n rounds for every methods
+nCPUs = params.nCPUs
 
 params.dryRun = false
 
@@ -31,12 +32,12 @@ models = [
    '--model demos.UnidentifiableProduct',
    '--model demos.XY',
    '--model demos.ToyMix',
-   '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
+//   '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
    '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
    '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
    '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
-   '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
-   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
+//   '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
+//   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 ]
 
 nRounds = 20
@@ -58,7 +59,7 @@ process runBlang {
                      
     each method from '--experimentConfigs.description IAIS --engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
                      '--experimentConfigs.description ISCM --engine iscm.ISCM --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description ISCM-always-resamp --engine iscm.ISCM --engine.resamplingESSThreshold 1.0 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description ISCM-high-resamp --engine iscm.ISCM --engine.resamplingESSThreshold 0.9 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
                      '--experimentConfigs.description PT --engine PT --engine.initialization FORWARD --engine.nScans 10000 --engine.nChains ' + nRounds    
 
     file code

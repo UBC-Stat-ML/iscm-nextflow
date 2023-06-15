@@ -18,4 +18,4 @@ per exploration phase')  +
       scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("lambdaInstantaneous.pdf", width = 10, height = 5, limitsize = FALSE)
+  ggsave("lambdaInstantaneous.pdf", width = 10, height = 4, limitsize = FALSE)

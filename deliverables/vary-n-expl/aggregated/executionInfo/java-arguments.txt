@@ -1,0 +1,1 @@
+--experimentConfigs.resultsHTMLPage false --experimentConfigs.tabularWriter.compressed true --dataPathInEachExecFolder lambdaInstantaneous.csv.gz --keys engine.nPassesPerScan as nPassesPerScan experimentConfigs.description as method model from arguments.tsv

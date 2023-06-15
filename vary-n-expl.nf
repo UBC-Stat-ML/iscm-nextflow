@@ -36,7 +36,7 @@ models = [
 
 nexpls = [0.0, 0.5, 1, 2, 4, 8]
 
-nRounds = 10
+nRounds = 15
 if (params.dryRun) {
   nRounds = 4
   models = models.subList(0, 1)

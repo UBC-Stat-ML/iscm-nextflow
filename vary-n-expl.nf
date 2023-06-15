@@ -40,7 +40,7 @@ models = [
 //   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 ]
 
-nexpls = [0.1, 1, 2, 4, 9]
+nexpls = [0.1, 1, 2, 4, 8]
 
 nRounds = 20
 if (params.dryRun) {

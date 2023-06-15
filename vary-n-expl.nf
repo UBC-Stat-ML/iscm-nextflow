@@ -36,9 +36,9 @@ models = [
 
 nexpls = [0.0, 0.5, 1, 2, 4, 8]
 
-nRounds = 20
+nRounds = 10
 if (params.dryRun) {
-  nRounds = 2
+  nRounds = 4
   models = models.subList(0, 1)
   nexpls = [0.5, 1]
 }
@@ -56,7 +56,7 @@ process runBlang {
     
     each nexpl from nexpls
                      
-    each method from '--experimentConfigs.description SSMC --engine iscm.ISCM --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds
+    each method from '--experimentConfigs.description SSMC --engine iscm.ISCM --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds ' + nRounds + ' --engine.nParticles ' + nCPUs 
 
     file code
     file data

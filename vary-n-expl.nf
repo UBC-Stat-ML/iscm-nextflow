@@ -40,7 +40,7 @@ models = [
 //   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 ]
 
-nexpls = [0.5, 1, 2, 4, 8]
+nexpls = [0.0, 0.5, 1, 2, 4, 8]
 
 nRounds = 20
 if (params.dryRun) {
@@ -129,15 +129,17 @@ process plot {
   require("ggplot2")
   require("dplyr")
   require("stringr")
+  require("scales")
   
-  
+  cc <- scales::seq_gradient_pal("grey", "black", "Lab")(seq(0,1,length.out=6))
   
   read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
     filter(isAdapt == "false") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    ggplot(aes(x = beta, y = value, colour = log2(nPassesPerScan), group = factor(nPassesPerScan))) +
-      labs(color='log2 expected updates\nper exploration phase')  + 
+    ggplot(aes(x = beta, y = value, colour = factor(nPassesPerScan), group = factor(nPassesPerScan))) +
+      labs(color='Expected updates\nper exploration phase')  + 
+      scale_colour_manual(values=cc) +
       geom_line()  + 
       scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
       facet_wrap(~model, scales = "free_y") +

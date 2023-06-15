@@ -27,17 +27,11 @@ params.dryRun = false
 
 models = [
    '--model blang.validation.internals.fixtures.Ising --model.beta 1',
-   '--model demos.DiscreteMultimodal',
-   '--model demos.AnnealedMVN',
-   '--model demos.UnidentifiableProduct',
    '--model demos.XY',
-   '--model demos.ToyMix',
-//   '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
    '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
-   '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
    '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
-//   '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
-//   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
+   '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
+   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 ]
 
 nexpls = [0.0, 0.5, 1, 2, 4, 8]
@@ -144,7 +138,7 @@ process plot {
       scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
-  ggsave("lambdaInstantaneous.pdf", width = 10, height = 5, limitsize = FALSE)
+  ggsave("lambdaInstantaneous.pdf", width = 10, height = 4, limitsize = FALSE)
 
   
 

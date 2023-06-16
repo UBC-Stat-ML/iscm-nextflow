@@ -27,7 +27,7 @@ params.dryRun = false
 
 models = [
    '--model blang.validation.internals.fixtures.Ising --model.beta 1',
-   '--model demos.DiscreteMultimodal',
+   /*'--model demos.DiscreteMultimodal',
    '--model demos.AnnealedMVN',
    '--model demos.UnidentifiableProduct',
    '--model demos.XY',
@@ -38,13 +38,25 @@ models = [
    '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
    '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
    '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
+*/
 ]
 
-nRounds = 20
+nRounds = 8
 if (params.dryRun) {
-  nRounds = 3
+  nRounds = 4 // should be at least 4 otherwise code crashes
   models = models.subList(0, 1)
 }
+
+def PT(nChains) {
+  return "--experimentConfigs.description PT-$nChains   --engine PT --engine.initialization FORWARD --engine.nScans ${Math.ceil(25*Math.pow(2,nRounds)/nChains)} --engine.nChains $nChains" 
+}
+
+methods = [
+  "--experimentConfigs.description SAIS --engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 5 --engine.nRounds $nRounds --engine.nParticles 5",
+  "--experimentConfigs.description SSMC --engine iscm.ISCM --engine.resamplingESSThreshold 0.9 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 5 --engine.nRounds $nRounds --engine.nParticles 5",
+  PT(10),
+  PT(20)
+]
 
 
 process runBlang {
@@ -57,9 +69,7 @@ process runBlang {
                      
     each model from  models
                      
-    each method from '--experimentConfigs.description SAIS --engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description SSMC --engine iscm.ISCM --engine.resamplingESSThreshold 0.9 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description PT   --engine PT --engine.initialization FORWARD --engine.nScans 50000 --engine.nChains ' + nRounds    
+    each method from methods 
 
     file code
     file data
@@ -70,7 +80,7 @@ process runBlang {
   """
   java -Xmx10g -cp ${code}/lib/\\* blang.runtime.Runner \
     --experimentConfigs.resultsHTMLPage false \
-    --experimentConfigs.tabularWriter.compressed true \
+    --experimentConfigs.tabularWriter.compressed false \
     $model \
     $method  \
     --engine.nThreads Fixed \
@@ -78,7 +88,7 @@ process runBlang {
      
   # consolidate all csv files in one place
   mkdir output
-  mv results/latest/monitoring/*.csv.gz output
+  mv results/latest/monitoring/*.csv output
   mv results/latest/*.tsv output
   mv results/latest/executionInfo/stdout.txt output
   mv results/latest/executionInfo/stderr.txt output
@@ -97,17 +107,17 @@ process aggregate {
   """
   aggregate \
     --experimentConfigs.resultsHTMLPage false \
-    --experimentConfigs.tabularWriter.compressed true \
+    --experimentConfigs.tabularWriter.compressed false \
     --dataPathInEachExecFolder \
-        lambdaInstantaneous.csv.gz \
-        cumulativeLambda.csv.gz \
-        globalLambda.csv.gz \
-        logNormalizationConstantProgress.csv.gz \
-        annealingParameters.csv.gz \
-        roundTimings.csv.gz \
-        multiRoundResampling.csv.gz \
-        predictedResamplingInterval.csv.gz \
-        energyExplCorrelation.csv.gz \
+        lambdaInstantaneous.csv \
+        cumulativeLambda.csv \
+        globalLambda.csv \
+        logNormalizationConstantProgress.csv \
+        annealingParameters.csv \
+        roundTimings.csv \
+        multiRoundResampling.csv \
+        predictedResamplingInterval.csv \
+        energyExplCorrelation.csv \
     --keys \
       experimentConfigs.description as method \
       model \
@@ -133,7 +143,7 @@ process plot {
   require("dplyr")
   require("stringr")
   
-  read.csv("aggregated/cumulativeLambda.csv.gz") %>%
+  read.csv("aggregated/cumulativeLambda.csv") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     ggplot(aes(x = round, y = value, colour = beta, group = beta)) +
@@ -142,7 +152,7 @@ process plot {
       theme_minimal()
   ggsave("cumulativeLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
   
-  read.csv("aggregated/globalLambda.csv.gz") %>%
+  read.csv("aggregated/globalLambda.csv") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     ggplot(aes(x = round, y = value)) +
@@ -151,12 +161,12 @@ process plot {
       theme_minimal()
   ggsave("globalLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
   
-  timings <- read.csv("aggregated/roundTimings.csv.gz") %>%
+  timings <- read.csv("aggregated/roundTimings.csv") %>%
     group_by(model, method) %>%
     mutate(value = cumsum(value)) %>%
     mutate(nExplorationSteps = cumsum(nExplorationSteps))
   
-  read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
+  read.csv("aggregated/lambdaInstantaneous.csv") %>%
     filter(isAdapt == "false") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
@@ -167,7 +177,7 @@ process plot {
       theme_minimal()
   ggsave("lambdaInstantaneous.pdf", width = 10, height = 5, limitsize = FALSE)
   
-  read.csv("aggregated/energyExplCorrelation.csv.gz") %>%
+  read.csv("aggregated/energyExplCorrelation.csv") %>%
     filter(isAdapt == "false") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
@@ -177,7 +187,7 @@ process plot {
       theme_minimal()
   ggsave("energyExplCorrelation.pdf", width = 10, height = 5, limitsize = FALSE)
   
-  read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+  read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     ggplot(aes(x = round, y = value, colour = method)) +
@@ -187,7 +197,7 @@ process plot {
       theme_minimal()
   ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 10, limitsize = FALSE)
   
-  read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+  read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
     inner_join(timings, by = c("model", "method", "round")) %>% 
     rename(value = value.x) %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
@@ -195,12 +205,12 @@ process plot {
     ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
       geom_line()  + 
       scale_x_log10() +
-      xlab("time (ms)") +
+      xlab("number of exploration steps") +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
   ggsave("logNormalizationConstantProgress-by-nExpl.pdf", width = 10, height = 10, limitsize = FALSE)
   
-  read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+  read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
     inner_join(timings, by = c("model", "method", "round")) %>% 
     rename(time = value.y) %>%
     rename(value = value.x) %>%
@@ -214,7 +224,7 @@ process plot {
       theme_minimal()
   ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 10, limitsize = FALSE)
   
-  read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+  read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
     inner_join(timings, by = c("model", "method", "round")) %>% 
     rename(time = value.y) %>%
     rename(value = value.x) %>%
@@ -229,7 +239,7 @@ process plot {
       theme_minimal()
   ggsave("logNormalizationConstantProgress-suffix.pdf", width = 10, height = 10, limitsize = FALSE)
   
-  read.csv("aggregated/annealingParameters.csv.gz") %>%
+  read.csv("aggregated/annealingParameters.csv") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
     ggplot(aes(x = round, y = value, colour = chain, group = chain)) +

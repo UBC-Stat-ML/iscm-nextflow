@@ -11,7 +11,7 @@ process buildCode {
   input:
     val gitRepoName from 'ptanalysis_internal'
     val gitUser from 'UBC-Stat-ML'
-    val codeRevision from 'ea8a8af7fe23b4a1b50ef4838629a9214091a4a5'
+    val codeRevision from 'bba259c7035ddda57fa8a8e525f8afa1511017c2'
     val snapshotPath from "${System.getProperty('user.home')}/w/ptanalysis"
   output:
     file 'code' into code
@@ -32,17 +32,17 @@ models = [
    '--model demos.UnidentifiableProduct',
    '--model demos.XY',
    '--model demos.ToyMix',
-//   '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
+   '--model demos.PhylogeneticTree --model.observations.file data/FES_8.g.fasta --model.observations.encoding DNA',
    '--model ode.MRNATransfection --model.data data/m_rna_transfection/processed.csv',
    '--model blang.validation.internals.fixtures.Diffusion --model.process NA NA NA NA NA NA NA NA NA 0.9 --model.startPoint 0.1',
    '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
-//   '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
-//   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
+   '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
+   '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 ]
 
 nRounds = 20
 if (params.dryRun) {
-  nRounds = 5
+  nRounds = 3
   models = models.subList(0, 1)
 }
 
@@ -57,10 +57,9 @@ process runBlang {
                      
     each model from  models
                      
-    each method from '--experimentConfigs.description IAIS --engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description ISCM --engine iscm.ISCM --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description ISCM-original --engine.logZLearningRate 1.0 --engine iscm.ISCM --engine.resamplingESSThreshold 0.5 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
-                     '--experimentConfigs.description PT --engine PT --engine.initialization FORWARD --engine.nScans 50000 --engine.nChains ' + nRounds    
+    each method from '--experimentConfigs.description SAIS --engine iscm.IAIS --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description SSMC --engine iscm.ISCM --engine.resamplingESSThreshold 0.9 --engine.usePosteriorSamplingScan true --engine.initialNumberOfSMCIterations 3 --engine.nRounds 15 --engine.nParticles ' + nRounds,
+                     '--experimentConfigs.description PT   --engine PT --engine.initialization FORWARD --engine.nScans 50000 --engine.nChains ' + nRounds    
 
     file code
     file data
@@ -101,6 +100,8 @@ process aggregate {
     --experimentConfigs.tabularWriter.compressed true \
     --dataPathInEachExecFolder \
         lambdaInstantaneous.csv.gz \
+        cumulativeLambda.csv.gz \
+        globalLambda.csv.gz \
         logNormalizationConstantProgress.csv.gz \
         annealingParameters.csv.gz \
         roundTimings.csv.gz \
@@ -132,26 +133,23 @@ process plot {
   require("dplyr")
   require("stringr")
   
-  
-  preds <- read.csv("aggregated/predictedResamplingInterval.csv.gz") %>%
+  read.csv("aggregated/cumulativeLambda.csv.gz") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    filter(method == "ISCM")
-  preds\$type <- 'predicted'
-  actuals <- read.csv("aggregated/multiRoundResampling.csv.gz") %>%
-    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
-    mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    filter(method == "ISCM") %>%
-    rename(value = deltaIterations)
-  actuals\$type <- 'actual'
-  
-  actuals %>%
-    full_join(preds, by = c("model", "method", "round", "type", "value")) %>%
-    ggplot(aes(x = round, y = value, colour = type)) +
-      geom_point() + 
-      facet_wrap(~model) +
+    ggplot(aes(x = round, y = value, colour = beta, group = beta)) +
+      geom_line()  + 
+      facet_grid(model~method, scales = "free_y") +
       theme_minimal()
-  ggsave("preds.pdf", width = 10, height = 5, limitsize = FALSE)
+  ggsave("cumulativeLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
+  
+  read.csv("aggregated/globalLambda.csv.gz") %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    ggplot(aes(x = round, y = value)) +
+      geom_line()  + 
+      facet_grid(model~method, scales = "free_y") +
+      theme_minimal()
+  ggsave("globalLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
   
   timings <- read.csv("aggregated/roundTimings.csv.gz") %>%
     group_by(model, method) %>%
@@ -241,30 +239,7 @@ process plot {
       theme_minimal()
   ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
   
-  read.csv("aggregated/annealingParameters.csv.gz") %>%
-    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
-    mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = method) %>%
-    filter(isAdapt == "false") %>% 
-    filter(method == "ISCM") %>%
-    ggplot(aes(x = chain, y = value)) +
-      geom_line()  + 
-      facet_grid(method~model, scales = "free_x") +
-      theme_minimal()
-  ggsave("annealingParameters-final.pdf", width = 30, height = 5, limitsize = FALSE)
 
-  read.csv("aggregated/annealingParameters.csv.gz") %>%
-    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
-    mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    mutate(method = method) %>%
-    filter(isAdapt == "false") %>% 
-    filter(method == "ISCM") %>%
-    ggplot(aes(x = chain, y = value)) +
-      geom_line()  + 
-      scale_y_log10() +
-      facet_grid(method~model, scales = "free_x") +
-      theme_minimal()
-  ggsave("annealingParameters-log-final.pdf", width = 30, height = 5, limitsize = FALSE)
 
   """
   

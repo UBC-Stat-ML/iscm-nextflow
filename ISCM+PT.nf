@@ -27,7 +27,7 @@ params.dryRun = false
 
 models = [
    '--model blang.validation.internals.fixtures.Ising --model.beta 1',
-   /*'--model demos.DiscreteMultimodal',
+   '--model demos.DiscreteMultimodal',
    '--model demos.AnnealedMVN',
    '--model demos.UnidentifiableProduct',
    '--model demos.XY',
@@ -38,10 +38,9 @@ models = [
    '--model mix.SimpleMixture --model.data file data/mixture_data.csv',
    '--model hier.HierarchicalRockets --model.data data/failure_counts.csv', 
    '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
-*/
 ]
 
-nRounds = 8
+nRounds = 10
 if (params.dryRun) {
   nRounds = 4 // should be at least 4 otherwise code crashes
   models = models.subList(0, 1)

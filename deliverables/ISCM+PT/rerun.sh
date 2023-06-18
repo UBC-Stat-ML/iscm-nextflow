@@ -17,7 +17,8 @@ read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
   mutate(model = str_replace(model, "SimpleMixture", "mixture")) %>% 
   mutate(model = str_replace(model, "SpikeSlabClassification", "spike-slab")) %>% 
   mutate(model = str_replace(model, "XY", "rotor")) %>% 
-  ggplot(aes(x = beta, y = value, colour = method, linetype = method)) +
+  rename(Algorithm = method) %>%
+  ggplot(aes(x = beta, y = value, colour = Algorithm, linetype = Algorithm)) +
     geom_line()  + 
     scale_y_continuous(expand = expansion(mult = 0.05), limits = c(0, NA)) +
     ylab("local barrier") + 

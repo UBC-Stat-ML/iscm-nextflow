@@ -1,5 +1,5 @@
 name,value,type,provided,enforcement,description,errors
-dataPathInEachExecFolder,lambdaInstantaneous.csv.gz logNormalizationConstantProgress.csv.gz annealingParameters.csv.gz roundTimings.csv.gz multiRoundResampling.csv.gz predictedResamplingInterval.csv.gz energyExplCorrelation.csv.gz,List,true,,Comma separated value (cvs or csv.gz) file(s) in each exec containing the data to be aggregated.,
+dataPathInEachExecFolder,lambdaInstantaneous.csv cumulativeLambda.csv globalLambda.csv logNormalizationConstantProgress.csv annealingParameters.csv roundTimings.csv multiRoundResampling.csv predictedResamplingInterval.csv energyExplCorrelation.csv,List,true,,Comma separated value (cvs or csv.gz) file(s) in each exec containing the data to be aggregated.,
 execFoldersPrefix,,String,false,default value: exec_,"Prefix of the directories, each containing stored command line arguments stored in tab separated values as well data in csv format.",
 experimentConfigs.configFile,,File,false,optional,"If set, use those arguments in provided file that do not appear in the provided arguments.",
 experimentConfigs.description,,String,false,optional,Documentation for this run.,
@@ -10,5 +10,5 @@ experimentConfigs.recordGitInfo,,boolean,false,default value: false,,
 experimentConfigs.resultsHTMLPage,false,boolean,true,default value: true,,
 experimentConfigs.saveStandardStreams,,boolean,false,default value: true,Save combined standard out and err into a file?,
 experimentConfigs.tabularWriter,,TabularWriterFactory: CSV|Spark|fully qualified,false,default value: CSV,,
-experimentConfigs.tabularWriter.compressed,true,boolean,true,default value: false,,
+experimentConfigs.tabularWriter.compressed,false,boolean,true,default value: false,,
 keys,experimentConfigs.description as method model from arguments.tsv,String,true,,Command line arguments stored in tab separated values for each exec. Syntax: comma separated list of (<key> [as <transformed-key>] )* from [optional] <tsv-file-in-each-exec>,

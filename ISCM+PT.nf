@@ -40,7 +40,7 @@ models = [
    '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 ]
 
-nRounds = 12
+nRounds = 15
 nPassesPerScan = 3
 if (params.dryRun) {
   nRounds = 4 // should be at least 4 otherwise code crashes

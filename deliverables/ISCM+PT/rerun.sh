@@ -23,5 +23,5 @@ read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
     ylab("local barrier") + 
     facet_wrap(~model, scales = "free_y") +
     theme_minimal()
-ggsave("lambdaInstantaneous.pdf", width = 10, height = 5, limitsize = FALSE)
+ggsave("barriers.pdf", width = 10, height = 5, limitsize = FALSE)
 

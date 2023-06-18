@@ -40,14 +40,16 @@ models = [
    '--model glms.SpikeSlabClassification --model.data data/titanic/titanic-covariates-unid.csv --model.instances.name Name --model.instances.maxSize 200 --model.labels.dataSource data/titanic/titanic.csv --model.labels.name Survived'
 ]
 
-nRounds = 10
+nRounds = 12
+nPassesPerScan = 3
 if (params.dryRun) {
   nRounds = 4 // should be at least 4 otherwise code crashes
   models = models.subList(0, 1)
 }
 
+
 def PT(nChains) {
-  return "--experimentConfigs.description PT-$nChains   --engine PT --engine.initialization FORWARD --engine.nScans ${Math.ceil(25*Math.pow(2,nRounds)/nChains)} --engine.nChains $nChains" 
+  return "--experimentConfigs.description PT-$nChains  --engine PT --engine.initialization FORWARD --engine.nScans ${Math.ceil(25*Math.pow(2,nRounds)/nChains)} --engine.nChains $nChains" 
 }
 
 methods = [
@@ -61,7 +63,7 @@ methods = [
 process runBlang {
   time '10h'  
   cpus nCPUs
-  memory '10 GB'
+  memory '20 GB'
   errorStrategy 'ignore'  
 
   input:
@@ -82,6 +84,7 @@ process runBlang {
     --experimentConfigs.tabularWriter.compressed false \
     $model \
     $method  \
+    --engine.nPassesPerScan $nPassesPerScan \
     --engine.nThreads Fixed \
     --engine.nThreads.number $nCPUs
      

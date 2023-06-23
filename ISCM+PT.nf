@@ -41,10 +41,12 @@ models = [
 ]
 
 nRounds = 15
+gbs = '20 GB'
 nPassesPerScan = 3
 if (params.dryRun) {
   nRounds = 4 // should be at least 4 otherwise code crashes
   models = models.subList(0, 1)
+  gbs = '1 GB'
 }
 
 
@@ -63,7 +65,7 @@ methods = [
 process runBlang {
   time '10h'  
   cpus nCPUs
-  memory '20 GB'
+  memory gbs
   errorStrategy 'ignore'  
 
   input:
@@ -145,28 +147,38 @@ process plot {
   require("dplyr")
   require("stringr")
   
+  timings <- read.csv("aggregated/roundTimings.csv") %>%
+    group_by(model, method) %>%
+    mutate(value = cumsum(value)) %>%
+    mutate(nExplorationSteps = cumsum(nExplorationSteps))
+  
   read.csv("aggregated/cumulativeLambda.csv") %>%
+    inner_join(timings, by = c("model", "method", "round")) %>% 
+    rename(value = value.x) %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    ggplot(aes(x = round, y = value, colour = beta, group = beta)) +
+    ggplot(aes(x = nExplorationSteps, y = value, colour = beta, group = beta)) +
       geom_line()  + 
+      scale_x_log10() +
+      xlab("number of exploration steps") + 
+      ylab("cumulative barrier estimate") +
       facet_grid(model~method, scales = "free_y") +
       theme_minimal()
   ggsave("cumulativeLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
   
   read.csv("aggregated/globalLambda.csv") %>%
+    inner_join(timings, by = c("model", "method", "round")) %>% 
+    rename(value = value.x) %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 
-    ggplot(aes(x = round, y = value)) +
+    ggplot(aes(x = nExplorationSteps, y = value)) +
       geom_line()  + 
+      scale_x_log10() +
+      xlab("number of exploration steps") + 
+      ylab("global barrier estimate") +
       facet_grid(model~method, scales = "free_y") +
       theme_minimal()
   ggsave("globalLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
-  
-  timings <- read.csv("aggregated/roundTimings.csv") %>%
-    group_by(model, method) %>%
-    mutate(value = cumsum(value)) %>%
-    mutate(nExplorationSteps = cumsum(nExplorationSteps))
   
   read.csv("aggregated/lambdaInstantaneous.csv") %>%
     filter(isAdapt == "false") %>%
@@ -241,7 +253,7 @@ process plot {
       theme_minimal()
   ggsave("logNormalizationConstantProgress-suffix.pdf", width = 10, height = 10, limitsize = FALSE)
   
-    read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
+  read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
     inner_join(timings, by = c("model", "method", "round")) %>% 
     rename(value = value.x) %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
@@ -251,6 +263,7 @@ process plot {
       geom_line()  + 
       scale_x_log10() +
       xlab("number of exploration steps") +
+      ylab("log normalization estimate") +
       facet_wrap(~model, scales = "free_y") +
       theme_minimal()
   ggsave("logNormalizationConstantProgress-by-nExpl-suffix.pdf", width = 10, height = 10, limitsize = FALSE)

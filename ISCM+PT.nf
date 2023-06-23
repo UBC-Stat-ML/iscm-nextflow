@@ -241,6 +241,20 @@ process plot {
       theme_minimal()
   ggsave("logNormalizationConstantProgress-suffix.pdf", width = 10, height = 10, limitsize = FALSE)
   
+    read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
+    inner_join(timings, by = c("model", "method", "round")) %>% 
+    rename(value = value.x) %>%
+    mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
+    mutate(model = str_replace(model, ".*[.]", "")) %>% 
+    filter(round > 2) %>%
+    ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
+      geom_line()  + 
+      scale_x_log10() +
+      xlab("number of exploration steps") +
+      facet_wrap(~model, scales = "free_y") +
+      theme_minimal()
+  ggsave("logNormalizationConstantProgress-by-nExpl-suffix.pdf", width = 10, height = 10, limitsize = FALSE)
+  
   read.csv("aggregated/annealingParameters.csv") %>%
     mutate(model = str_replace(model, "[\$]Builder", "")) %>% 
     mutate(model = str_replace(model, ".*[.]", "")) %>% 

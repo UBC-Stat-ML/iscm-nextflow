@@ -41,12 +41,10 @@ models = [
 ]
 
 nRounds = 15
-gbs = '20 GB'
 nPassesPerScan = 3
 if (params.dryRun) {
   nRounds = 4 // should be at least 4 otherwise code crashes
   models = models.subList(0, 1)
-  gbs = '1 GB'
 }
 
 
@@ -65,7 +63,7 @@ methods = [
 process runBlang {
   time '10h'  
   cpus nCPUs
-  memory gbs
+  memory '20 GB'
   errorStrategy 'ignore'  
 
   input:

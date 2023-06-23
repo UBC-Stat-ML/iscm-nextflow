@@ -3,28 +3,38 @@ require("ggplot2")
 require("dplyr")
 require("stringr")
 
+timings <- read.csv("aggregated/roundTimings.csv") %>%
+  group_by(model, method) %>%
+  mutate(value = cumsum(value)) %>%
+  mutate(nExplorationSteps = cumsum(nExplorationSteps))
+
 read.csv("aggregated/cumulativeLambda.csv") %>%
+  inner_join(timings, by = c("model", "method", "round")) %>% 
+  rename(value = value.x) %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  ggplot(aes(x = round, y = value, colour = beta, group = beta)) +
+  ggplot(aes(x = nExplorationSteps, y = value, colour = beta, group = beta)) +
     geom_line()  + 
+    scale_x_log10() +
+    xlab("number of exploration steps") + 
+    ylab("cumulative barrier estimate") +
     facet_grid(model~method, scales = "free_y") +
     theme_minimal()
 ggsave("cumulativeLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
 
 read.csv("aggregated/globalLambda.csv") %>%
+  inner_join(timings, by = c("model", "method", "round")) %>% 
+  rename(value = value.x) %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  ggplot(aes(x = round, y = value)) +
+  ggplot(aes(x = nExplorationSteps, y = value)) +
     geom_line()  + 
+    scale_x_log10() +
+    xlab("number of exploration steps") + 
+    ylab("global barrier estimate") +
     facet_grid(model~method, scales = "free_y") +
     theme_minimal()
 ggsave("globalLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
-
-timings <- read.csv("aggregated/roundTimings.csv") %>%
-  group_by(model, method) %>%
-  mutate(value = cumsum(value)) %>%
-  mutate(nExplorationSteps = cumsum(nExplorationSteps))
 
 read.csv("aggregated/lambdaInstantaneous.csv") %>%
   filter(isAdapt == "false") %>%
@@ -99,7 +109,7 @@ read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
     theme_minimal()
 ggsave("logNormalizationConstantProgress-suffix.pdf", width = 10, height = 10, limitsize = FALSE)
 
-  read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
+read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
   inner_join(timings, by = c("model", "method", "round")) %>% 
   rename(value = value.x) %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
@@ -109,6 +119,7 @@ ggsave("logNormalizationConstantProgress-suffix.pdf", width = 10, height = 10, l
     geom_line()  + 
     scale_x_log10() +
     xlab("number of exploration steps") +
+    ylab("log normalization estimate") +
     facet_wrap(~model, scales = "free_y") +
     theme_minimal()
 ggsave("logNormalizationConstantProgress-by-nExpl-suffix.pdf", width = 10, height = 10, limitsize = FALSE)

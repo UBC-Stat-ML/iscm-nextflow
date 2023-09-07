@@ -7,7 +7,6 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   filter(model == "Ising") %>% 
-  filter(method != "ISCM-original") %>%
   mutate(method = str_replace(method, "IAIS", "SAIS")) %>% 
   mutate(method = str_replace(method, "ISCM", "SSMC")) %>% 
   ggplot(aes(x = round, y = value, colour = chain, group = chain)) +
@@ -17,4 +16,5 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
     labs(color='index i')  +
     scale_y_log10() +
     theme_minimal()
-ggsave("annealingParameters-ising.pdf", width = 10, height = 3, limitsize = FALSE)
+ggsave("ising.pdf", width = 10, height = 3, limitsize = FALSE)
+

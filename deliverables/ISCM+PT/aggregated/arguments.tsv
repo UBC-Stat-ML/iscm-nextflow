@@ -1,5 +1,5 @@
 keys	experimentConfigs.description as method model from arguments.tsv
-dataPathInEachExecFolder	lambdaInstantaneous.csv.gz logNormalizationConstantProgress.csv.gz annealingParameters.csv.gz roundTimings.csv.gz multiRoundResampling.csv.gz predictedResamplingInterval.csv.gz energyExplCorrelation.csv.gz
+dataPathInEachExecFolder	lambdaInstantaneous.csv cumulativeLambda.csv globalLambda.csv logNormalizationConstantProgress.csv annealingParameters.csv roundTimings.csv multiRoundResampling.csv predictedResamplingInterval.csv energyExplCorrelation.csv
 execFoldersPrefix	exec_
 experimentConfigs.managedExecutionFolder	true
 experimentConfigs.saveStandardStreams	true
@@ -9,5 +9,5 @@ experimentConfigs.recordExecutionInfo	true
 experimentConfigs.configFile	<optional>
 experimentConfigs.description	<optional>
 experimentConfigs.maxIndentationToPrint	inf
-experimentConfigs.tabularWriter.compressed	true
+experimentConfigs.tabularWriter.compressed	false
 experimentConfigs.tabularWriter	CSV

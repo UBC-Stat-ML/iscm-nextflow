@@ -3,33 +3,40 @@ require("ggplot2")
 require("dplyr")
 require("stringr")
 
-
-preds <- read.csv("aggregated/predictedResamplingInterval.csv.gz") %>%
-  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
-  mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  filter(method == "ISCM")
-preds$type <- 'predicted'
-actuals <- read.csv("aggregated/multiRoundResampling.csv.gz") %>%
-  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
-  mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  filter(method == "ISCM") %>%
-  rename(value = deltaIterations)
-actuals$type <- 'actual'
-
-actuals %>%
-  full_join(preds, by = c("model", "method", "round", "type", "value")) %>%
-  ggplot(aes(x = round, y = value, colour = type)) +
-    geom_point() + 
-    facet_wrap(~model) +
-    theme_minimal()
-ggsave("preds.pdf", width = 10, height = 5, limitsize = FALSE)
-
-timings <- read.csv("aggregated/roundTimings.csv.gz") %>%
+timings <- read.csv("aggregated/roundTimings.csv") %>%
   group_by(model, method) %>%
   mutate(value = cumsum(value)) %>%
   mutate(nExplorationSteps = cumsum(nExplorationSteps))
 
-read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
+read.csv("aggregated/cumulativeLambda.csv") %>%
+  inner_join(timings, by = c("model", "method", "round")) %>% 
+  rename(value = value.x) %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  ggplot(aes(x = nExplorationSteps, y = value, colour = beta, group = beta)) +
+    geom_line()  + 
+    scale_x_log10() +
+    xlab("number of exploration steps") + 
+    ylab("cumulative barrier estimate") +
+    facet_grid(model~method, scales = "free_y") +
+    theme_minimal()
+ggsave("cumulativeLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
+
+read.csv("aggregated/globalLambda.csv") %>%
+  inner_join(timings, by = c("model", "method", "round")) %>% 
+  rename(value = value.x) %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  ggplot(aes(x = nExplorationSteps, y = value)) +
+    geom_line()  + 
+    scale_x_log10() +
+    xlab("number of exploration steps") + 
+    ylab("global barrier estimate") +
+    facet_grid(model~method, scales = "free_y") +
+    theme_minimal()
+ggsave("globalLambdaEstimates.pdf", width = 10, height = 30, limitsize = FALSE)
+
+read.csv("aggregated/lambdaInstantaneous.csv") %>%
   filter(isAdapt == "false") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
@@ -40,7 +47,7 @@ read.csv("aggregated/lambdaInstantaneous.csv.gz") %>%
     theme_minimal()
 ggsave("lambdaInstantaneous.pdf", width = 10, height = 5, limitsize = FALSE)
 
-read.csv("aggregated/energyExplCorrelation.csv.gz") %>%
+read.csv("aggregated/energyExplCorrelation.csv") %>%
   filter(isAdapt == "false") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
@@ -50,7 +57,7 @@ read.csv("aggregated/energyExplCorrelation.csv.gz") %>%
     theme_minimal()
 ggsave("energyExplCorrelation.pdf", width = 10, height = 5, limitsize = FALSE)
 
-read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   ggplot(aes(x = round, y = value, colour = method)) +
@@ -60,7 +67,7 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
     theme_minimal()
 ggsave("logNormalizationConstantProgress-by-round.pdf", width = 10, height = 10, limitsize = FALSE)
 
-read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
   inner_join(timings, by = c("model", "method", "round")) %>% 
   rename(value = value.x) %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
@@ -68,12 +75,12 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
   ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
     geom_line()  + 
     scale_x_log10() +
-    xlab("time (ms)") +
+    xlab("number of exploration steps") +
     facet_wrap(~model, scales = "free_y") +
     theme_minimal()
 ggsave("logNormalizationConstantProgress-by-nExpl.pdf", width = 10, height = 10, limitsize = FALSE)
 
-read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
   inner_join(timings, by = c("model", "method", "round")) %>% 
   rename(time = value.y) %>%
   rename(value = value.x) %>%
@@ -87,7 +94,7 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
     theme_minimal()
 ggsave("logNormalizationConstantProgress.pdf", width = 10, height = 10, limitsize = FALSE)
 
-read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
+read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
   inner_join(timings, by = c("model", "method", "round")) %>% 
   rename(time = value.y) %>%
   rename(value = value.x) %>%
@@ -102,7 +109,22 @@ read.csv("aggregated/logNormalizationConstantProgress.csv.gz") %>%
     theme_minimal()
 ggsave("logNormalizationConstantProgress-suffix.pdf", width = 10, height = 10, limitsize = FALSE)
 
-read.csv("aggregated/annealingParameters.csv.gz") %>%
+read.csv("aggregated/logNormalizationConstantProgress.csv") %>%
+  inner_join(timings, by = c("model", "method", "round")) %>% 
+  rename(value = value.x) %>%
+  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
+  mutate(model = str_replace(model, ".*[.]", "")) %>% 
+  filter(round > 2) %>%
+  ggplot(aes(x = nExplorationSteps, y = value, colour = method, linetype = method)) +
+    geom_line()  + 
+    scale_x_log10() +
+    xlab("number of exploration steps") +
+    ylab("log normalization estimate") +
+    facet_wrap(~model, scales = "free_y") +
+    theme_minimal()
+ggsave("logNormalizationConstantProgress-by-nExpl-suffix.pdf", width = 10, height = 10, limitsize = FALSE)
+
+read.csv("aggregated/annealingParameters.csv") %>%
   mutate(model = str_replace(model, "[$]Builder", "")) %>% 
   mutate(model = str_replace(model, ".*[.]", "")) %>% 
   ggplot(aes(x = round, y = value, colour = chain, group = chain)) +
@@ -111,28 +133,3 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
     scale_y_log10() +
     theme_minimal()
 ggsave("annealingParameters.pdf", width = 10, height = 30, limitsize = FALSE)
-
-read.csv("aggregated/annealingParameters.csv.gz") %>%
-  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
-  mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = method) %>%
-  filter(isAdapt == "false") %>% 
-  filter(method == "ISCM") %>%
-  ggplot(aes(x = chain, y = value)) +
-    geom_line()  + 
-    facet_grid(method~model, scales = "free_x") +
-    theme_minimal()
-ggsave("annealingParameters-final.pdf", width = 30, height = 5, limitsize = FALSE)
-
-read.csv("aggregated/annealingParameters.csv.gz") %>%
-  mutate(model = str_replace(model, "[$]Builder", "")) %>% 
-  mutate(model = str_replace(model, ".*[.]", "")) %>% 
-  mutate(method = method) %>%
-  filter(isAdapt == "false") %>% 
-  filter(method == "ISCM") %>%
-  ggplot(aes(x = chain, y = value)) +
-    geom_line()  + 
-    scale_y_log10() +
-    facet_grid(method~model, scales = "free_x") +
-    theme_minimal()
-ggsave("annealingParameters-log-final.pdf", width = 30, height = 5, limitsize = FALSE)

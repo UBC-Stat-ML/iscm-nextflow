@@ -54,7 +54,7 @@ read.csv("aggregated/lambdaInstantaneous.csv") %>%
     facet_wrap(~model, scales = "free_y") +
 	ylab("local barrier") +
     theme_minimal()
-ggsave("lambdaInstantaneous.pdf", width = 10, height = 5, limitsize = FALSE)
+ggsave("barriers.pdf", width = 10, height = 5, limitsize = FALSE)
 
 read.csv("aggregated/energyExplCorrelation.csv") %>%
   filter(isAdapt == "false") %>%

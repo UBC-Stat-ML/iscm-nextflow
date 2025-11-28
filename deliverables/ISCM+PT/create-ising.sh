@@ -16,5 +16,5 @@ read.csv("aggregated/annealingParameters.csv.gz") %>%
     labs(color='index i')  +
     scale_y_log10() +
     theme_minimal()
-ggsave("ising.pdf", width = 10, height = 3, limitsize = FALSE)
+ggsave("annealingParameters-ising.pdf", width = 10, height = 3, limitsize = FALSE)
 
